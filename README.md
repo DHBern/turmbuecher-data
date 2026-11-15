@@ -15,11 +15,14 @@ Viewer: <https://dhbern.github.io/turmbuecher-data/> (abgeleitet aus dem der
 
 - **Alle 89 Bände** sind eingelesen (13 089 Seiten, 11 010 mit Text, 839 in Transkribus als Ground
   Truth markiert), darunter der Band «Henzi» (in Transkribus «Henzi_duplicated»).
-- **Einträge:** Vier Pilotbände (B IX 422, 428, 467, 509) sind maschinell in 455 Einträge gegliedert;
-  444 davon haben Datum, Titel (Delikt und Person), Kurzregest, Delikte und Ausgang
-  (`scripts/entries.py`, offenes Modell Qwen3.8-27B auf dem GPUStack der Universität Bern,
-  Vokabular in `taxonomy/delikte.json`). Alles ungeprüfte Maschinenentwürfe. Die übrigen Bände
-  erscheinen vorerst Seite für Seite.
+- **Einträge:** Alle 82 Bände mit Text sind maschinell in 8 086 Einträge gegliedert; 7 928 davon
+  haben Datum, Titel (Delikt und Person), Kurzregest, Delikte und Ausgang (`scripts/entries.py`,
+  offenes Modell Qwen3.8-27B auf dem GPUStack der Universität Bern, Vokabular in
+  `taxonomy/delikte.json`, erweiterbar nach `taxonomy/README.md`). Alles ungeprüfte
+  Maschinenentwürfe. Sieben Bände (B IX 498–500, 502–505) haben in Transkribus noch keinen Text.
+- **Jahre** gelten nur innerhalb der Spanne ihres Bandes (bekannt aus `taxonomy/bandjahre.json`
+  oder dem Titel, sonst aus den gelesenen Jahren und den Nachbarbänden erschlossen); ein Jahr, das
+  genau 50 oder 100 Jahre daneben liegt, wird berichtigt, ein anderes verworfen.
 - **Auswertung:** Sankey Zeitraum → Delikt → zusammen genannte Delikte bzw. Ausgang, Delikte über
   die Zeit, Häufigkeit der Delikte (`site/analysis.js`).
 - **Lesungen:** der Text aus Transkribus (`transkribus-bestand`); ausser auf den Ground-Truth-Seiten

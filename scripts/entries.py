@@ -331,7 +331,8 @@ def volume_years(by_vol: dict[str, list[dict]], docs: dict[str, str]) -> list[st
     model reads many years wrong by exactly 50 or 100 (1520 for 1570, 1684 for
     1584), so a year is believed only inside its volume's span:
 
-    * the span is the one in the volume's title where there is one; else the
+    * the span is the one known for the volume (taxonomy/bandjahre.json) or the
+      one in its title, where there is one; else the
       densest cluster of the years read in the volume, and of several clusters
       the one that fits between the neighbouring volumes;
     * a year outside the span that falls inside it when moved by 50 or 100 is
@@ -340,7 +341,9 @@ def volume_years(by_vol: dict[str, list[dict]], docs: dict[str, str]) -> list[st
     """
     order = sorted((v for v in by_vol if re.match(r"^B IX \d+", v)), key=vol_number)
     years = {v: [y for e in by_vol[v] if e["x"] and (y := year_of(e["x"]["datum"]))] for v in by_vol}
-    fixed = {v: title_span(docs[v]) for v in by_vol}
+    known = json.loads((ROOT / "taxonomy" / "bandjahre.json").read_text(encoding="utf-8"))
+    fixed = {v: (known[v]["von"], known[v]["bis"]) if isinstance(known.get(v), dict) else title_span(docs[v])
+             for v in by_vol}
 
     def clusters(v: str) -> list[tuple[int, int]]:
         """(entries within the window, centre) for every year read, best first."""
@@ -375,7 +378,7 @@ def volume_years(by_vol: dict[str, list[dict]], docs: dict[str, str]) -> list[st
     report = []
     for v, es in by_vol.items():
         span = fixed[v]
-        src = "Titel"
+        src = "bekannt" if isinstance(known.get(v), dict) else "Titel"
         if not span and centre[v] is not None:
             before, after = neighbours(v) if v in order else (None, None)
             # believable: near the centre, or between the neighbouring volumes' centres

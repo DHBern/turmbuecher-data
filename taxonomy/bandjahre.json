@@ -1,0 +1,4 @@
+{
+ "_": "Bekannte Laufzeiten einzelner Bände. Ein Eintrag hier geht den aus den gelesenen Jahren erschlossenen Spannen vor (scripts/entries.py, volume_years). Ergänzen, wo der Archivkatalog die Laufzeit nennt: Bandname wie in readings/pages.tsv (Spalte volume).",
+ "Henzi": {"von": 1749, "bis": 1749, "quelle": "Verhöre zur Henzi-Verschwörung, Sommer 1749; das Modell liest die Jahrzehntziffer uneinheitlich (1649, 1669, 1719 …)"}
+}
