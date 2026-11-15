@@ -60,8 +60,8 @@
   "img.failed": "Das Bild konnte nicht von Transkribus geladen werden.",
   "img.full": "Ganzes Bild",
   "img.off": "Die Bilder sind in dieser Fassung noch nicht freigeschaltet.",
-  "img.credit": "Staatsarchiv des Kantons Bern, B IX 422–509. Aufnahmen aus dem Projekt «The Flow»; die Bilder liefert Transkribus.",
-  "foot": "Staatsarchiv des Kantons Bern · Projekt «The Flow» · Digital Humanities, Universität Bern · Prototyp",
+  "img.credit": "Staatsarchiv des Kantons Bern (StABE), B IX 422–509. Die Bilder sind gemeinfrei; Aufnahmen aus dem Projekt «The Flow», ausgeliefert von Transkribus.",
+  "foot": "Staatsarchiv des Kantons Bern (StABE), B IX 422–509 · Projekt «The Flow» · Digital Humanities, Universität Bern · Prototyp",
 
   "readings.aria": "Lesungen",
   "reading.none": "Von dieser Seite gibt es noch keine Lesung.",

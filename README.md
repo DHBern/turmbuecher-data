@@ -24,9 +24,9 @@ Viewer: <https://dhbern.github.io/turmbuecher-data/> (abgeleitet aus dem der
 - **Text und Bild sind Zeile für Zeile verknüpft** (Zeilenumrisse aus Transkribus).
 - **Personen, Orte, Organisationen und Daten**, soweit in Transkribus ausgezeichnet, werden
   übernommen (`entities/`): ungeprüft, noch nicht mit Normdaten verknüpft.
-- **Bilder:** Der Viewer kann sie über IIIF von `files.transkribus.eu` laden. In der
-  veröffentlichten Fassung ist das ausgeschaltet (`site/config.json`, `"images": false`), bis die
-  Anzeige mit dem Staatsarchiv geklärt ist. In diesem Repository liegen keine Bilder.
+- **Bilder:** Der Viewer lädt sie über IIIF von `files.transkribus.eu`. Die Bilder sind gemeinfrei;
+  die Vorlagen liegen im Staatsarchiv des Kantons Bern (StABE), B IX 422–509. In diesem Repository
+  liegen keine Bilder.
 
 ## Inhalt
 
