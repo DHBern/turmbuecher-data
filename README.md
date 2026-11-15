@@ -11,16 +11,22 @@ Viewer: <https://dhbern.github.io/turmbuecher-data/> (abgeleitet aus dem der
 [St. Galler Missiven](https://github.com/DHBern/sg-missiven-data) und der
 [Thuner Missiven](https://github.com/DHBern/thun-missiven-data)).
 
-## Stand (Meilenstein M1, 15.11.2026)
+## Stand (15.11.2026)
 
-- **Vier Pilotbände** sind eingelesen: B IX 422, 428, 467, 509 (687 Seiten, 675 mit Text,
-  76 in Transkribus als Ground Truth markiert).
-- **Die Einheit ist vorerst die Seite.** Die Gliederung in Einträge folgt (M3); dann wird der
-  Eintrag zur Einheit, mit Datum, Titel (Delikt und Person), Kurzregest und Deliktlabels.
-- **Eine Lesung:** der Text, der in Transkribus steht (`transkribus-bestand`). Ausser auf den als
-  Ground Truth markierten Seiten ist er unkorrigierte Maschinenlesung. Welches Modell die Seiten
-  gelesen hat, ist in Transkribus nicht festgehalten. Weitere Lesungen mit offenen und eigenen
-  Modellen folgen (M2).
+- **Alle 89 Bände** sind eingelesen (13 089 Seiten, 11 010 mit Text, 839 in Transkribus als Ground
+  Truth markiert), darunter der Band «Henzi» (in Transkribus «Henzi_duplicated»).
+- **Einträge:** Vier Pilotbände (B IX 422, 428, 467, 509) sind maschinell in 455 Einträge gegliedert;
+  444 davon haben Datum, Titel (Delikt und Person), Kurzregest, Delikte und Ausgang
+  (`scripts/entries.py`, offenes Modell Qwen3.8-27B auf dem GPUStack der Universität Bern,
+  Vokabular in `taxonomy/delikte.json`). Alles ungeprüfte Maschinenentwürfe. Die übrigen Bände
+  erscheinen vorerst Seite für Seite.
+- **Auswertung:** Sankey Zeitraum → Delikt → zusammen genannte Delikte bzw. Ausgang, Delikte über
+  die Zeit, Häufigkeit der Delikte (`site/analysis.js`).
+- **Lesungen:** der Text aus Transkribus (`transkribus-bestand`); ausser auf den Ground-Truth-Seiten
+  unkorrigierte Maschinenlesung. Weitere Lesungen mit eigenen Modellen (Qwen3.5-4B Kurrent, TrOCR
+  Kurrent) laufen und werden zu einer gemeinsamen Lesung zusammengeführt
+  (`scripts/joint_reading.py`): ein Wort ändert sich nur, wo zwei andere Leser übereinstimmen. Ein
+  Abgleich mit Ground Truth ist nicht das Ziel.
 - **Text und Bild sind Zeile für Zeile verknüpft** (Zeilenumrisse aus Transkribus).
 - **Personen, Orte, Organisationen und Daten**, soweit in Transkribus ausgezeichnet, werden
   übernommen (`entities/`): ungeprüft, noch nicht mit Normdaten verknüpft.
@@ -34,7 +40,11 @@ Viewer: <https://dhbern.github.io/turmbuecher-data/> (abgeleitet aus dem der
 |---|---|
 | `readings/pages.tsv` | alle Seiten in Signaturfolge: Schlüssel, Band, Seite, Bildgrösse, Status in Transkribus, Zeilen, Zeilen mit Text, Bildkennung (`tk`) |
 | `readings/<lesung>.jsonl` | eine Zeile pro Seite: `key`, `text` (eine Zeile pro Textzeile) |
-| `readings/lines.jsonl` | Zeilengeometrie pro Seite: Umriss, Text und Regionstyp jeder Zeile |
+| `readings/lines/<band>.jsonl` | Zeilengeometrie pro Seite: Umriss, Text und Regionstyp jeder Zeile |
+| `readings/units.tsv` | die Einheiten des Viewers: Einträge mit ihren Seiten und Zeilenbereichen |
+| `entries/` | Eintragsgrenzen (`segments.jsonl`), Antworten des Modells (`extract.jsonl`), die Einträge (`entries.jsonl`) |
+| `regests/drafts.jsonl` | Titel und Regest pro Eintrag (Maschinenentwurf) |
+| `taxonomy/delikte.json` | Deliktvokabular (vorläufig) |
 | `readings/readers.json` | wer jede Lesung ist, mit Vorbehalten |
 | `entities/<lesung>.jsonl` | Auszeichnungen als Zeichenbereiche des Seitentexts |
 | `ops/ingest_transkribus.py` | holt Metadaten und PAGE-XML aus Transkribus (läuft auf tei; nur lesend; ohne Benutzernamen) |

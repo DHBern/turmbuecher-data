@@ -98,15 +98,13 @@ def load_readings(known: set[str]) -> dict[str, dict[str, dict]]:
 
 def load_lines(known: set[str]) -> dict[str, dict]:
     """readings/lines.jsonl: per page key its rows (the TextLines, docs/LINES.md)."""
-    path = ROOT / "readings" / "lines.jsonl"
     out: dict[str, dict] = {}
-    if not path.exists():
-        return out
-    for line in path.read_text(encoding="utf-8").splitlines():
-        if line.strip():
-            rec = json.loads(line)
-            if rec["key"] in known and rec.get("poly"):
-                out[rec["key"]] = rec
+    for path in sorted((ROOT / "readings" / "lines").glob("*.jsonl")):
+        for line in path.read_text(encoding="utf-8").splitlines():
+            if line.strip():
+                rec = json.loads(line)
+                if rec["key"] in known and rec.get("poly"):
+                    out[rec["key"]] = rec
     return out
 
 
@@ -220,11 +218,49 @@ def load_units(pages: dict[str, dict]) -> list[dict]:
         if missing:
             sys.exit(f"units.tsv: {r['id']} names pages not in pages.tsv: {missing[:3]}")
         seen.update(keys)
-        units.append({**r, "keys": keys})
-    lost = [k for k in pages if k not in seen]
-    if lost:
-        print(f"  {len(lost)} pages in no unit, e.g. {lost[:3]}", file=sys.stderr)
+        spans: dict[str, list[int]] = {}
+        for k, a, b in json.loads(r["spans"]) if r.get("spans") else []:
+            spans[k] = [a, b]           # the unit's lines on that page (0-based, in the reading it was cut on)
+        units.append({**r, "keys": keys, "spans": spans})
+    # a page in no unit (a volume not yet cut into entries, an empty page) is
+    # its own unit, after the entries of its volume
+    if path.exists():
+        order = list(dict.fromkeys(p["volume"] for p in pages.values()))
+        for k, p in pages.items():
+            if k not in seen:
+                units.append({"id": k, "shelf": p["volume"], "nr": p["pageNr"], "title": "", "keys": [k], "spans": {}, "page": True})
+        units.sort(key=lambda u: (order.index(u["shelf"]), bool(u.get("page"))))
+    else:
+        for u in units:
+            u["page"] = True
     return units
+
+
+def write_analysis() -> None:
+    """site/data/analysis.json for the charts: the vocabulary and, per described
+    entry, [id, year, offences, sanctions, continuation, volume, title] with the
+    vocabulary as indexes. Nothing is written while there are no entries."""
+    path = ROOT / "entries" / "entries.jsonl"
+    if not path.exists():
+        return
+    tax = json.loads((ROOT / "taxonomy" / "delikte.json").read_text(encoding="utf-8"))
+    off = [d["id"] for d in tax["delikte"]]
+    san = [d["id"] for d in tax["sanktionen"]]
+    rows, vols = [], []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        e = json.loads(line)
+        if not e.get("regest") or e.get("kind") == "register":
+            continue
+        if e["volume"] not in vols:
+            vols.append(e["volume"])
+        rows.append([e["id"], e.get("year"), [off.index(o) for o in e["delikte"]],
+                     [san.index(x) for x in e["sanktionen"]], 1 if e.get("fortsetzung") else 0,
+                     vols.index(e["volume"]), e.get("title", "")])
+    out = {"offences": [{"id": d["id"], "label": d["label"], "group": d["gruppe"]} for d in tax["delikte"]],
+           "sanctions": [{"id": d["id"], "label": d["label"]} for d in tax["sanktionen"]],
+           "volumes": vols, "entries": rows,
+           "model": sorted({json.loads(x)["model"] for x in path.read_text(encoding="utf-8").splitlines() if json.loads(x).get("model")})}
+    (OUT / "analysis.json").write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
 
 
 def main() -> None:
@@ -251,6 +287,7 @@ def main() -> None:
 
     pair = {(a, b): {"edits": 0, "chars": 0, "pages": 0} for a, b in itertools.combinations(ids, 2)}
     read = {r: 0 for r in ids}
+    counted: set[tuple[str, str]] = set()
     linked = {r: [0, 0] for r in ids}   # lines linked, lines on pages with rows
     index, pagekeys, chunk = [], {}, []
     for pos, lt in enumerate(letters):
@@ -262,11 +299,15 @@ def main() -> None:
             rec = {"key": key, "vol": p["volume"], "nr": num(p["pageNr"]), "tk": p.get("tk", ""),
                    "w": num(p.get("width", "")), "h": num(p.get("height", "")),
                    "st": p.get("status", ""), "lines": num(p.get("lines", "")), "readings": {}}
+            if key in lt.get("spans", {}):
+                rec["span"] = lt["spans"][key]
             for r in ids:
                 rd = readings[r].get(key)
                 if rd is not None:
                     rec["readings"][r] = rd
-                    read[r] += 1
+                    if (r, key) not in counted:      # a page shared by two units is read once
+                        counted.add((r, key))
+                        read[r] += 1
             dis = {}
             for a, b in itertools.combinations([r for r in ids if rec["readings"].get(r, {}).get("text")], 2):
                 ta, tb = flat(rec["readings"][a]["text"]), flat(rec["readings"][b]["text"])
@@ -292,13 +333,16 @@ def main() -> None:
         chunk.append(full)
         row = {"id": lt["id"], "shelf": lt["shelf"], "nr": lt["nr"], "n": len(recs),
                "tk": recs[0]["tk"] if recs else ""}
+        if lt.get("page"):
+            row["p"] = 1
+            full["p"] = 1
         sts = {x["st"] for x in recs}
         if len(sts) == 1 and recs[0]["st"]:
             row["st"] = recs[0]["st"]
         if not any(x["readings"] for x in recs):
             row["e"] = 1        # no reading at all
         if d:
-            row.update({"h": d["heading"], "y": d["year"]})
+            row.update({"h": d["heading"], "y": d["year"], "o": d["offences"]})
         index.append(row)
         if len(chunk) == CHUNK or pos == len(letters) - 1:
             (OUT / "units" / f"{pos // CHUNK}.json").write_text(json.dumps(chunk, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
@@ -318,11 +362,12 @@ def main() -> None:
     shards = write_search(letters, readings, ids)
     vols: dict[str, dict] = {}
     for p in pages.values():
-        v = vols.setdefault(p["volume"], {"v": p["volume"], "doc": p["doc"], "pages": 0, "gt": 0, "text": 0})
+        v = vols.setdefault(p["volume"], {"v": p["volume"], "doc": p["volume"] if p["volume"] == "Henzi" else p["doc"], "pages": 0, "gt": 0, "text": 0})
         v["pages"] += 1
         v["gt"] += p.get("status") in ("GT", "DONE", "FINAL")
         v["text"] += int(p.get("text_lines") or 0) > 0
-    out = {"chunk": CHUNK, "pages": len(pages), "by_page": not (ROOT / "readings" / "units.tsv").exists(),
+    write_analysis()
+    out = {"chunk": CHUNK, "analysis": (OUT / "analysis.json").exists(), "pages": len(pages),
            "volumes": list(vols.values()), "units": index, "search": shards}
     (OUT / "index.json").write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     (OUT / "pagekeys.json").write_text(json.dumps(pagekeys, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")

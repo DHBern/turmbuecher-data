@@ -59,9 +59,9 @@
   }
 
   /* ---------- names ---------- */
-  const byPage = () => !!state.index.by_page;
-  const unitWord = (n) => t(byPage() ? "page" : "entry", null, n);
-  const titleOf = (u) => `${u.shelf}, ${t(byPage() ? "page.abbr" : "entry.abbr")} ${u.nr}`;
+  /* a unit is an entry, or (u.p) a page of a volume not yet cut into entries */
+  const unitWord = (n) => t("unit", null, n);
+  const titleOf = (u) => `${u.shelf}, ${t(u.p ? "page.abbr" : "entry.abbr")} ${u.nr}`;
   const readerLabel = (id) => { const r = (state.readers || []).find((x) => x.id === id); return r ? loc(r, "label") : (id || t("draft.areading")); };
   const thumb = (tk) => `${state.cfg.iiif}${encodeURIComponent(tk)}/full/120,/0/default.jpg`;
   const statusBadge = (st) => (st ? `<span class="badge st-${esc(st)}" title="${esc(t(`status.${st}.title`))}">${esc(t("status." + st))}</span>` : "");
@@ -97,6 +97,7 @@
     if (parts[0] === "page" && parts[1]) return toPageKey(parts[1], parts[2]);
     if (parts[0] === "readers") return showReaders();
     if (parts[0] === "about") return showAbout();
+    if (parts[0] === "auswertung") { setNav("analysis"); return window.TBAnalysis.show(app, { t, esc, num, json, store }); }
     return showList(parts[0] === "band" ? parts[1] : null);
   }
 
@@ -113,9 +114,9 @@
   function unitRow(u, extra = "", href = `#/e/${encodeURIComponent(u.id)}/1`) {
     return `<div class="row lrow">
       <span class="th">${state.cfg.images && u.tk ? `<img src="${thumb(u.tk)}" alt="" loading="lazy" width="44" height="60">` : ""}</span>
-      <span class="num">${esc(t(byPage() ? "page.abbr" : "entry.abbr"))} ${esc(u.nr)}</span>
+      <span class="num">${esc(t(u.p ? "page.abbr" : "entry.abbr"))} ${esc(u.nr)}</span>
       <span class="body"><a class="who" href="${href}">${esc(titleOf(u))}</a>
-        <span class="small muted">${u.e ? esc(t("status.none")) : ""} ${statusBadge(u.st === "IN_PROGRESS" || u.e ? "" : u.st)}${!byPage() ? ` ${num(u.n)} ${esc(t("page", null, u.n))}` : ""}</span>
+        <span class="small muted">${u.e ? esc(t("status.none")) : ""} ${statusBadge(u.st === "IN_PROGRESS" || u.e ? "" : u.st)}${!u.p ? ` ${num(u.n)} ${esc(t("page", null, u.n))}${u.y ? " · " + esc(u.y) : ""}` : ""}</span>
         ${u.h ? `<span class="reg">${esc(u.h)} ${draftMark()}</span>` : ""}${extra}</span>
     </div>`;
   }
@@ -128,7 +129,7 @@
       <section class="intro">
         <h1>${esc(t("list.h1"))} <span class="badge proto">${esc(t("proto"))}</span></h1>
         <p>${esc(t("list.intro"))}</p>
-        <p class="small muted">${esc(t("list.state", { volumes: num(vols.length), pages: num(state.index.pages), text: num(sum("text")), gt: num(sum("gt")) }))} ${esc(t("list.caveat"))}</p>
+        <p class="small muted">${esc(t("list.state", { volumes: num(vols.length), pages: num(state.index.pages), text: num(sum("text")), gt: num(sum("gt")), entries: num(units.filter((u) => !u.p).length) }))} ${esc(t("list.caveat"))}</p>
       </section>
       <div class="filters">
         <input id="q" type="search" placeholder="${esc(t("list.filter"))}" value="${esc(state.filter)}" aria-label="${esc(t("list.filter.aria"))}">
@@ -151,7 +152,7 @@
         if (!us.length) return "";
         const isOpen = open.has(v.v) || (words.length && rows.length <= 200);
         return `<details class="vol" data-vol="${esc(v.v)}" ${isOpen ? "open" : ""}>
-          <summary><span class="shelf">${esc(v.doc)}</span> <span class="muted small">${esc(t("list.vol.meta", { pages: num(v.pages), text: num(v.text), gt: num(v.gt) }))}</span></summary>
+          <summary><span class="shelf">${esc(v.doc)}</span> <span class="muted small">${esc(t("list.vol.meta", { pages: num(v.pages), text: num(v.text), gt: num(v.gt), entries: num(units.filter((u) => u.shelf === v.v && !u.p).length) }))}</span></summary>
           <div class="list">${isOpen ? us.map((u) => unitRow(u)).join("") : ""}</div></details>`;
       }).join("") || `<p class="empty">${esc(t("list.none"))}</p>`;
     };
@@ -206,7 +207,8 @@
      (data/search/<reader>/text-N.json: unit id -> its page texts) and loaded,
      in parallel, only once a query is typed. Without a query the facets alone
      select. The whole search lives in the URL. */
-  const FACETS = ["vol", "st", "dec", "dr"];
+  const FACETS = ["vol", "of", "dec", "st", "dr"];
+  let TAXO = null;   // offence id -> label, from data/analysis.json
   const texts = new Map();   // reader -> Promise<{unit id: [page texts]}>
   const normed = new Map();  // reader|tol -> Map(unit id -> [normalised page texts])
   let searchTimer = null;
@@ -269,6 +271,7 @@
     if (k === "vol") return u.shelf;
     if (k === "st") return u.e ? "none" : (u.st || "");
     if (k === "dec") return u.y ? String(Math.floor(u.y / 10) * 10) : "";
+    if (k === "of") return u.o || [];
     if (k === "dr") return state.hasDrafts ? (u.h ? "yes" : "no") : "";
     return "";
   }
@@ -276,12 +279,14 @@
     if (k === "st") return t("status." + v);
     if (k === "dec") return t("facet.dec.label", { v });
     if (k === "dr") return t("facet.dr." + v);
+    if (k === "of") return (TAXO && TAXO[v]) || v;
     return v;
   }
 
   async function showSearch(params) {
     setNav("search");
     state.hasDrafts = state.index.units.some((u) => u.h);
+    if (!TAXO && state.index.analysis) { try { TAXO = Object.fromEntries((await json("data/analysis.json")).offences.map((o) => [o.id, o.label])); } catch { TAXO = {}; } }
     const readers = state.readers.filter((r) => state.index.search[r.id]);
     const ui = { q: params.get("q") || "", tol: params.get("tol") !== "0", shown: 50, ff: {},
                  reader: readers.some((r) => r.id === params.get("r")) ? params.get("r") : (readers.some((r) => r.id === state.reader) ? state.reader : (readers[0] || {}).id) };
@@ -348,7 +353,8 @@
         $("sres").innerHTML = `<p class="empty">${esc(readers.length ? t("search.hint") : t("search.noreading"))}</p>`;
         return;
       }
-      const passes = (h, except) => FACETS.every((k) => k === except || !sel[k].size || sel[k].has(facetValue(h.u, k)));
+      const vals = (u, k) => [].concat(facetValue(u, k)).filter(Boolean);
+      const passes = (h, except) => FACETS.every((k) => k === except || !sel[k].size || vals(h.u, k).some((v) => sel[k].has(v)));
       const rows = base.filter((h) => passes(h, null));
       $("fsel").textContent = nSel ? `(${t("search.selected", { n: nSel })})` : "";
       $("facets").innerHTML = facetsHtml(base, passes);
@@ -371,7 +377,7 @@
     function facetsHtml(base, passes) {
       return FACETS.map((k) => {
         const counts = new Map();
-        for (const h of base) if (passes(h, k)) { const v = facetValue(h.u, k); if (v) counts.set(v, (counts.get(v) || 0) + 1); }
+        for (const h of base) if (passes(h, k)) for (const v of [].concat(facetValue(h.u, k)).filter(Boolean)) counts.set(v, (counts.get(v) || 0) + 1);
         for (const v of sel[k]) if (!counts.has(v)) counts.set(v, 0);
         const vals = sortVals(k, counts);
         if (!vals.length) return "";
@@ -461,7 +467,8 @@
             ${nextU ? `<a href="${href(nextU.id, 1)}">${esc(titleOf(nextU))} →</a>` : "<span></span>"}
           </div>
           <div class="muted small">${esc(t("unit.tkpage"))} ${esc(page.key)} ${Object.keys(page.readings).length ? statusBadge(page.st) : `<span class="badge st-NEW">${esc(t("status.none"))}</span>`}</div>
-          <h1>${esc(unit.title || titleOf(unit))}</h1>
+          <h1>${esc((unit.draft && unit.draft.heading) || unit.title || titleOf(unit))}</h1>
+          ${unit.draft && unit.draft.heading ? `<div class="muted small">${esc(titleOf(unit))} ${draftMark()}</div>` : ""}
           ${draftBlock(unit.draft)}
           <div class="pages">${pages.length > 1 ? `<span class="lbl">${esc(t("unit.pages"))}</span>${pages.map(pgBtn).join("")}` : ""}
             ${state.cfg.images ? `<button type="button" class="linkish imgtoggle" id="imgtoggle" aria-pressed="${showImg}">${esc(t(showImg ? "img.hide" : "img.show"))}</button>` : ""}
@@ -574,16 +581,34 @@
     } else if (mode === "ents") {
       body = entHtml(rd.text, page.ents[readerId]);
     } else body = esc(rd.text);
+    const inside = spanLines(page, rd);
     return head + trunc + note + (mode === "ents" ? legend() : "") + lineNote(rd.ln, page) +
-      `<div class="text ${mode === "ents" ? "ents" : ""}">${numberLines(body, rd.ln, page.rt)}</div>`;
+      (inside && inside.some((x) => !x) ? `<p class="small muted">${esc(t("span.note"))}</p>` : "") +
+      `<div class="text ${mode === "ents" ? "ents" : ""}">${numberLines(body, rd.ln, page.rt, inside)}</div>`;
   }
 
   /* a line whose row lies in a heading region (Transkribus layout) is set off */
-  function numberLines(body, ln, rt) {
+  /* Which lines of this reading belong to the entry on screen: page.span names
+     the entry's first and last line in the reading it was cut on (the Transkribus
+     text); other readings follow through the rows on the image both are linked
+     to. null = everything (no span, or no way to tell). */
+  function spanLines(page, rd) {
+    if (!page.span) return null;
+    const base = page.readings["transkribus-bestand"];
+    const n = rd.text.split("\n").length;
+    if (rd === base) return Array.from({ length: n }, (_, i) => i >= page.span[0] && i <= page.span[1]);
+    if (!base || !base.ln || !rd.ln) return null;
+    const rows = new Set();
+    for (let i = page.span[0]; i <= page.span[1]; i++) (base.ln[i] || []).forEach((j) => rows.add(j));
+    let last = false;
+    return Array.from({ length: n }, (_, i) => { const r = rd.ln[i] || []; if (r.length) last = r.some((j) => rows.has(j)); return last; });
+  }
+
+  function numberLines(body, ln, rt, inside) {
     return body.split("\n").map((l, i) => {
       const kind = rt && ln && ln[i] && ln[i].length ? rt[ln[i][0]] : "";
-      const cls = kind === "heading" ? " hd" : kind === "page-number" ? " pn" : "";
-      return `<span class="line${cls}" data-i="${i}"${cls === " hd" ? ` title="${esc(t("lines.heading"))}"` : ""}><span class="ln">${i + 1}</span>${l}</span>`;
+      const cls = (kind === "heading" ? " hd" : kind === "page-number" ? " pn" : "") + (inside && !inside[i] ? " out" : "");
+      return `<span class="line${cls}" data-i="${i}"${cls.includes(" hd") ? ` title="${esc(t("lines.heading"))}"` : ""}><span class="ln">${i + 1}</span>${l}</span>`;
     }).join("");
   }
 

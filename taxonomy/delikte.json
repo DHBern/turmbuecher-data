@@ -1,0 +1,48 @@
+{
+ "_": "Kontrolliertes Vokabular für die automatische Erschliessung der Turmbuch-Einträge. Vorläufig (15.11.2026), noch nicht mit dem Projekt «The Flow» abgestimmt. Ein Eintrag kann mehrere Delikte, Verfahrensschritte und Sanktionen tragen.",
+ "delikte": [
+  {"id": "diebstahl", "label": "Diebstahl", "gruppe": "Eigentum", "hinweis": "stehlen, entfremden, nemen, diebstal"},
+  {"id": "raub", "label": "Raub", "gruppe": "Eigentum", "hinweis": "Strassenraub, gewaltsame Wegnahme"},
+  {"id": "betrug", "label": "Betrug und Fälschung", "gruppe": "Eigentum", "hinweis": "Betrug, falsche Siegel und Briefe, Falschspiel"},
+  {"id": "falschmuenzerei", "label": "Falschmünzerei", "gruppe": "Eigentum", "hinweis": "falsche Münzen machen oder ausgeben"},
+  {"id": "hehlerei", "label": "Hehlerei", "gruppe": "Eigentum", "hinweis": "gestohlenes Gut kaufen oder verbergen"},
+  {"id": "schulden", "label": "Schulden und Veruntreuung", "gruppe": "Eigentum", "hinweis": "nicht bezahlte Schulden, veruntreutes Amts- oder Mündelgut"},
+  {"id": "toetung", "label": "Tötung", "gruppe": "Gewalt", "hinweis": "Mord, Totschlag"},
+  {"id": "kindstoetung", "label": "Kindstötung", "gruppe": "Gewalt", "hinweis": "Tötung oder Aussetzung eines Neugeborenen, Abtreibung"},
+  {"id": "koerperverletzung", "label": "Körperverletzung und Schlaghändel", "gruppe": "Gewalt", "hinweis": "verwunden, schlagen, Raufhändel, Drohung mit Gewalt"},
+  {"id": "brandstiftung", "label": "Brandstiftung", "gruppe": "Gewalt", "hinweis": "Brand legen, Branddrohung"},
+  {"id": "ehebruch", "label": "Ehebruch", "gruppe": "Sittlichkeit", "hinweis": "Ehebruch, Hurerei Verheirateter"},
+  {"id": "unzucht", "label": "Unzucht", "gruppe": "Sittlichkeit", "hinweis": "Hurerei Lediger, uneheliche Schwangerschaft, Kuppelei"},
+  {"id": "blutschande", "label": "Blutschande", "gruppe": "Sittlichkeit", "hinweis": "Inzest"},
+  {"id": "sodomie", "label": "Sodomie", "gruppe": "Sittlichkeit", "hinweis": "Bestialität, gleichgeschlechtliche Handlungen (Quellenbegriff)"},
+  {"id": "bigamie", "label": "Bigamie und Eheversprechen", "gruppe": "Sittlichkeit", "hinweis": "Doppelehe, gebrochenes Eheversprechen, böswilliges Verlassen"},
+  {"id": "notzucht", "label": "Notzucht", "gruppe": "Sittlichkeit", "hinweis": "Vergewaltigung"},
+  {"id": "hexerei", "label": "Hexerei und Zauberei", "gruppe": "Glaube und Magie", "hinweis": "Hexerei, Teufelspakt, Zauberei, Segnen, Wahrsagen"},
+  {"id": "taeufertum", "label": "Täufertum", "gruppe": "Glaube und Magie", "hinweis": "Täufer, Wiedertäufer"},
+  {"id": "gotteslaesterung", "label": "Gotteslästerung", "gruppe": "Glaube und Magie", "hinweis": "Schwören, Fluchen, Lästern, Religionsvergehen"},
+  {"id": "aufruhr", "label": "Aufruhr und Verschwörung", "gruppe": "Obrigkeit", "hinweis": "Aufruhr, Verschwörung, Verrat"},
+  {"id": "schmaehung", "label": "Schmähung der Obrigkeit", "gruppe": "Obrigkeit", "hinweis": "Schmähreden gegen Rat, Amtleute, Prädikanten"},
+  {"id": "ehrverletzung", "label": "Ehrverletzung", "gruppe": "Obrigkeit", "hinweis": "Scheltworte, Verleumdung zwischen Privaten"},
+  {"id": "ungehorsam", "label": "Ungehorsam", "gruppe": "Obrigkeit", "hinweis": "Missachtung von Geboten, Amtsvergehen, Widersetzlichkeit"},
+  {"id": "urfehdebruch", "label": "Urfehde- und Eidbruch", "gruppe": "Obrigkeit", "hinweis": "gebrochene Urfehde, Rückkehr trotz Verweisung, Meineid"},
+  {"id": "reislauf", "label": "Fremde Kriegsdienste", "gruppe": "Obrigkeit", "hinweis": "unerlaubtes Reislaufen, Werbung, Desertion, Bruch des Dingvertrags"},
+  {"id": "bettel", "label": "Bettel und Landstreicherei", "gruppe": "Lebensweise", "hinweis": "Bettel, müssiges Umherziehen, Landstreicher"},
+  {"id": "liederlichkeit", "label": "Liederlichkeit und Trunkenheit", "gruppe": "Lebensweise", "hinweis": "Trunkenheit, Spiel, Verschwendung, liederliches Haushalten"},
+  {"id": "sonstiges", "label": "Sonstiges", "gruppe": "Sonstiges", "hinweis": "ein Vorwurf, der in keine Kategorie passt"},
+  {"id": "unklar", "label": "Unklar", "gruppe": "Sonstiges", "hinweis": "kein Vorwurf erkennbar"}
+ ],
+ "verfahren": [
+  {"id": "guetlich", "label": "Gütliche Befragung"},
+  {"id": "peinlich", "label": "Peinliche Befragung (Folter)"}
+ ],
+ "sanktionen": [
+  {"id": "todesstrafe", "label": "Todesstrafe"},
+  {"id": "leibstrafe", "label": "Leib- und Ehrenstrafe", "hinweis": "Ruten, Pranger, Halseisen, Brandmarken, Ehrloserklärung"},
+  {"id": "verweisung", "label": "Verweisung", "hinweis": "Landesverweis, Verbannung aus Stadt und Land"},
+  {"id": "urfehde", "label": "Urfehde und Entlassung", "hinweis": "auf Urfehde oder Eid ledig gelassen"},
+  {"id": "busse", "label": "Busse und Kosten", "hinweis": "Geldbusse, Kostenersatz"},
+  {"id": "haft", "label": "Haft und Arbeit", "hinweis": "Gefangenschaft als Strafe, Schallenwerk, Galeere"},
+  {"id": "freilassung", "label": "Freilassung", "hinweis": "ohne Strafe entlassen, Vermahnung"},
+  {"id": "unbekannt", "label": "Ausgang nicht genannt"}
+ ]
+}

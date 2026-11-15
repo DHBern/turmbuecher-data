@@ -1,7 +1,30 @@
 [
- {"id": "transkribus-bestand",
+ {
+  "id": "joint",
+  "label": "Zusammengeführte Lesung",
+  "kind": "aus mehreren Lesungen",
+  "about": "Der Text aus Transkribus als Rückgrat; ein Wort ist nur dort ersetzt, wo mindestens zwei andere Leser übereinstimmend anders lesen. Seiten, die in Transkribus als Ground Truth markiert sind, sind unverändert übernommen. Wo Transkribus keinen Text hat, ist die erste vorhandene Maschinenlesung das Rückgrat.",
+  "caveat": "Keine geprüfte Transkription. Die Regel gleicht einzelne Lesefehler aus, mehr nicht: Zeilenumbrüche, fehlende und überzählige Wörter bleiben wie im Rückgrat."
+ },
+ {
+  "id": "transkribus-bestand",
   "label": "Transkribus-Bestand",
   "kind": "Arbeitstext aus Transkribus",
   "about": "Der Text, der in der Transkribus-Sammlung 187323 («StABE_Turmbücher_DH_flow») steht, exportiert im November 2026. Er ist im Projekt «The Flow» entstanden: automatische Texterkennung, auf einem Teil der Seiten von Hand korrigiert. Welches Erkennungsmodell die einzelnen Seiten gelesen hat, ist in Transkribus nicht festgehalten.",
-  "caveat": "Kein geprüfter Editionstext. Seiten mit dem Status «GT» gelten im Projekt als Ground Truth; alle übrigen sind unkorrigierte Maschinenausgabe mit falsch gelesenen Wörtern, zusammengezogenen oder geteilten Zeilen und übersehenen Zeilen. Die Auszeichnungen von Personen, Orten und Daten stammen ebenfalls aus Transkribus; wer oder was sie gesetzt hat, ist dort nicht festgehalten."}
+  "caveat": "Kein geprüfter Editionstext. Seiten mit dem Status «GT» gelten im Projekt als Ground Truth; alle übrigen sind unkorrigierte Maschinenausgabe mit falsch gelesenen Wörtern, zusammengezogenen oder geteilten Zeilen und übersehenen Zeilen. Die Auszeichnungen von Personen, Orten und Daten stammen ebenfalls aus Transkribus; wer oder was sie gesetzt hat, ist dort nicht festgehalten."
+ },
+ {
+  "id": "qwen3.5-4b-german-kurrent-xvi-xix-page-v1",
+  "label": "Qwen3.5-4B Kurrent (Seite)",
+  "kind": "eigenes Modell, ganze Seiten",
+  "about": "Qwen3.5-4B, an der Universität Bern auf deutsche Kurrent- und Kanzleischriften des 16.–19. Jahrhunderts feinjustiert; liest die ganze Seite in einem Zug.",
+  "caveat": "Unkorrigierte Maschinenlesung. Ein Seitenmodell kann flüssigen Text erfinden, wo es nichts lesen kann, und Zeilen auslassen; bei Doppelseiten gerät die Reihenfolge leicht durcheinander."
+ },
+ {
+  "id": "trocr-kurrent-xvi-xvii",
+  "label": "TrOCR Kurrent 16./17. Jh.",
+  "kind": "eigenes Modell, Zeile für Zeile",
+  "about": "TrOCR, an der Universität Bern auf Kurrent des 16. und 17. Jahrhunderts trainiert; liest Zeile für Zeile auf einer eigenen, automatischen Zeilenerkennung (kraken).",
+  "caveat": "Unkorrigierte Maschinenlesung. Die Zeilenerkennung teilt Zeilen anders als Transkribus und übersieht manche; die Reihenfolge der Zeilen kann abweichen."
+ }
 ]

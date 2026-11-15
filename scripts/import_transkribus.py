@@ -17,7 +17,7 @@ Outputs:
 * ``readings/transkribus-bestand.jsonl``: one line per page that has text,
   ``{"key", "text"}``, one text line per ``TextLine`` that has text, in reading
   order, trailing blanks removed.
-* ``readings/lines.jsonl``: the line geometry of every page with ``TextLine``s:
+* ``readings/lines/<volume>.jsonl``: the line geometry of every page with ``TextLine``s:
   ``{"key", "size": [w, h], "poly": [[x, y, ...], ...], "text": [...],
   "region": [...]}`` — per ``TextLine`` its outline (at most ``POLY_POINTS``
   points, in ten-thousandths of the image *width*, the unit OpenSeadragon
@@ -61,6 +61,8 @@ def doc_sort_key(title: str) -> tuple:
 
 def volume(title: str) -> str:
     """'B IX 428 (1564-1566)' -> 'B IX 428'; 'B IX 498 (neu)' -> 'B IX 498'."""
+    if title.startswith("Henzi"):       # "Henzi_duplicated": a document name from the making, one volume
+        return "Henzi"
     return re.sub(r"\s*\(.*?\)\s*", "", title).strip()
 
 
@@ -257,12 +259,23 @@ def main() -> None:
 
     (ROOT / "readings").mkdir(exist_ok=True)
     (ROOT / "entities").mkdir(exist_ok=True)
-    out = [ROOT / "readings" / f"{READER}.jsonl", ROOT / "readings" / "lines.jsonl",
-           ROOT / "entities" / f"{READER}.jsonl", ROOT / "readings" / "pages.tsv"]
+    # line geometry: one file per volume (readings/lines/<volume>.jsonl), the
+    # whole corpus in one file would pass GitHub's size limit
+    (ROOT / "readings" / "lines").mkdir(exist_ok=True)
+    vol_of = {r["key"]: r["volume"] for r in table}
+    by_vol: dict[str, list[dict]] = {}
+    for g in geo:
+        by_vol.setdefault(vol_of[g["key"]], []).append(g)
+    line_files = []
+    for v, rows_v in by_vol.items():
+        path = ROOT / "readings" / "lines" / (re.sub(r"[^A-Za-z0-9]+", "_", v) + ".jsonl")
+        write_jsonl(path, rows_v)
+        line_files.append(path)
+    out = [ROOT / "readings" / f"{READER}.jsonl", ROOT / "entities" / f"{READER}.jsonl",
+           ROOT / "readings" / "pages.tsv"] + line_files
     write_jsonl(out[0], readings)
-    write_jsonl(out[1], geo)
-    write_jsonl(out[2], entities)
-    with out[3].open("w", encoding="utf-8", newline="") as fh:
+    write_jsonl(out[1], entities)
+    with out[2].open("w", encoding="utf-8", newline="") as fh:
         w = csv.DictWriter(fh, fieldnames=list(table[0]), delimiter="\t", lineterminator="\n")
         w.writeheader()
         w.writerows(table)

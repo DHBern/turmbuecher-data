@@ -438,3 +438,32 @@ details.about-reader p { margin: 6px 0; }
 .text .line.hd { font-weight: 600; }
 .text .line.pn { color: var(--muted); }
 .lang[hidden] { display: none; }
+
+/* ---------- Auswertung ---------- */
+.text .line.out { opacity: .38; }
+.anbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 10px 0; font-size: .9rem; }
+.anbar input[type=number] { width: 5.5em; padding: 3px 6px; border: 1px solid var(--line); border-radius: 6px; font: inherit; }
+.anbar select { padding: 3px 6px; border: 1px solid var(--line); border-radius: 6px; font: inherit; background: #fff; }
+.an-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 4px 0 12px; font-size: .85rem; color: var(--muted); }
+.an-legend i, .an-tip .sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; }
+.an-card { background: #fcfcfb; border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin: 14px 0; }
+.an-card h2 { margin: 0 0 4px; font-size: 1.1rem; }
+.chart svg { display: block; max-width: none; font-family: inherit; }
+.chart text { font-size: 12px; fill: #52514e; }
+.chart .colhead { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; fill: #898781; }
+.chart .blabel, .chart .snode text { fill: #0b0b0b; }
+.chart .bval { fill: #52514e; }
+.chart .grid line { stroke: #e1e0d9; }
+.chart .base { stroke: #c3c2b7; }
+.chart .hit { fill: transparent; cursor: pointer; }
+.slink { stroke-opacity: .38; cursor: pointer; mix-blend-mode: multiply; }
+.slink:hover { stroke-opacity: .7; }
+.slink.dim { stroke-opacity: .1; }
+.snode rect { cursor: pointer; }
+.an-tip { position: fixed; pointer-events: none; z-index: 30; max-width: 320px; }
+.an-tip[hidden] { display: none; }
+.an-picked { border-top: 1px solid var(--line); margin-top: 10px; padding-top: 8px; }
+.an-picked h3 { margin: 0 0 6px; font-size: 1rem; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.an-picked ul { margin: 0; padding-left: 18px; columns: 2 320px; font-size: .9rem; }
+details.tableview { margin-top: 8px; font-size: .9rem; }
+details.tableview summary { cursor: pointer; color: var(--muted); }
