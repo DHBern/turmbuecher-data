@@ -467,3 +467,7 @@ details.about-reader p { margin: 6px 0; }
 .an-picked ul { margin: 0; padding-left: 18px; columns: 2 320px; font-size: .9rem; }
 details.tableview { margin-top: 8px; font-size: .9rem; }
 details.tableview summary { cursor: pointer; color: var(--muted); }
+
+/* ---------- Karte ---------- */
+.tbmap { height: min(68vh, 640px); min-height: 380px; border: 1px solid var(--line); border-radius: 10px; margin: 8px 0; background: #f1eee8; z-index: 0; }
+.tbmap .leaflet-tooltip { font: inherit; font-size: .85rem; }

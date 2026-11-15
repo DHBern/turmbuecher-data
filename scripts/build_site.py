@@ -375,7 +375,10 @@ def main() -> None:
         v["gt"] += p.get("status") in ("GT", "DONE", "FINAL")
         v["text"] += int(p.get("text_lines") or 0) > 0
     write_analysis()
-    out = {"chunk": CHUNK, "analysis": (OUT / "analysis.json").exists(), "pages": len(pages),
+    reg = ROOT / "register" / "orte.json"
+    if reg.exists():        # the map's places (scripts/places.py); the viewer joins them to analysis.json by entry id
+        shutil.copyfile(reg, OUT / "map.json")
+    out = {"chunk": CHUNK, "analysis": (OUT / "analysis.json").exists(), "map": (OUT / "map.json").exists(), "pages": len(pages),
            "volumes": list(vols.values()), "units": index, "search": shards}
     (OUT / "index.json").write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     (OUT / "pagekeys.json").write_text(json.dumps(pagekeys, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")

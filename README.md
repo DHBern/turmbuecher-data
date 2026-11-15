@@ -23,6 +23,11 @@ Viewer: <https://dhbern.github.io/turmbuecher-data/> (abgeleitet aus dem der
 - **Jahre** gelten nur innerhalb der Spanne ihres Bandes (bekannt aus `taxonomy/bandjahre.json`
   oder dem Titel, sonst aus den gelesenen Jahren und den Nachbarbänden erschlossen); ein Jahr, das
   genau 50 oder 100 Jahre daneben liegt, wird berichtigt, ein anderes verworfen.
+- **Karte:** Herkunft der Beschuldigten und genannte Orte, mit Filter nach Zeitraum und Delikt
+  (`site/map.js`, Kartengrund swisstopo). 529 Orte sind über die Ortssuche von swisstopo verknüpft
+  (`scripts/places.py`, `register/orte.json`), das sind 43 % der Ortsnennungen; verknüpft wird nur,
+  wo der ganze Name auf genau einen Schweizer Ort passt. Ältere Namen stehen in
+  `taxonomy/ortsnamen.json` und lassen sich dort ergänzen.
 - **Auswertung:** Sankey Zeitraum → Delikt → zusammen genannte Delikte bzw. Ausgang, Delikte über
   die Zeit, Häufigkeit der Delikte (`site/analysis.js`).
 - **Lesungen:** der Text aus Transkribus (`transkribus-bestand`); ausser auf den Ground-Truth-Seiten

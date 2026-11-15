@@ -92,11 +92,13 @@
     const [path, qs] = location.hash.replace(/^#\/?/, "").split("?");
     const parts = path.split("/").map(decodeURIComponent);
     if (parts[0] !== "e") { destroyOsd(); cur = null; }
+    if (parts[0] !== "karte") window.TBMap.leave();
     if (parts[0] === "search") return showSearch(new URLSearchParams(qs || ""));
     if (parts[0] === "e" && parts[1]) return showUnit(parts[1], +(parts[2] || 1), parts[3]);
     if (parts[0] === "page" && parts[1]) return toPageKey(parts[1], parts[2]);
     if (parts[0] === "readers") return showReaders();
     if (parts[0] === "about") return showAbout();
+    if (parts[0] === "karte") { setNav("map"); return window.TBMap.show(app, { t, esc, num, json, store }); }
     if (parts[0] === "auswertung") { setNav("analysis"); return window.TBAnalysis.show(app, { t, esc, num, json, store }); }
     return showList(parts[0] === "band" ? parts[1] : null);
   }

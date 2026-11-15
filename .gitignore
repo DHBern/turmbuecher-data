@@ -10,3 +10,6 @@ site/data/
 # local copy of the ingest (PAGE XML, manifest) and the template this repo started from
 _ingest/
 _vorlage_thun/
+
+# swisstopo answers, a cache (scripts/places.py geocode)
+register/orte_cache.jsonl
