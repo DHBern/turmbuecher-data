@@ -84,7 +84,7 @@
   "draft.summary": "Regest – Maschinenentwurf",
   "draft.badge": "Maschinenentwurf",
   "draft.badge.title": "Von einem Sprachmodell aus einer maschinellen Lesung entworfen",
-  "draft.year": "Jahr gelesen als {year} (ungeprüft)",
+  "draft.year": "Jahr {year} ({source}; ungeprüft)",
   "draft.note": "Titel und Regest entworfen von {model} aus der Lesung {reader}, von niemandem geprüft. Namen und Daten können falsch sein.",
   "draft.amodel": "einem Sprachmodell",
   "draft.areading": "einer maschinellen Lesung",
@@ -126,8 +126,8 @@
   "about.html": "<h1>Über diese Seite</h1><p>Ein Prototyp der <a href=\"https://www.dh.unibe.ch/\" target=\"_blank\" rel=\"noopener\">Digital Humanities der Universität Bern</a> für die Suche in den Berner Turmbüchern und ihre inhaltliche Erschliessung. Die Turmbücher (Staatsarchiv des Kantons Bern, B IX 422–509) sind im Projekt <a href=\"https://flow-project.net/\" target=\"_blank\" rel=\"noopener\">«The Flow»</a> (Schweizerischer Nationalfonds und Deutsche Forschungsgemeinschaft, 2023–2026) aufgenommen und in Transkribus bearbeitet worden.</p><h2>Was zu sehen ist</h2><ul><li><b>Bild und Text, Zeile für Zeile verknüpft.</b> Wer auf eine Textzeile zeigt, sieht sie im Bild, und umgekehrt.</li><li><b>Der Text aus Transkribus</b> als erste Lesung. Seiten mit dem Status «Ground Truth» sind als solche gekennzeichnet; alle übrigen sind unkorrigierte Maschinenlesung.</li><li><b>Personen, Orte und Daten</b>, soweit sie in Transkribus ausgezeichnet sind – ungeprüft und noch nicht mit Normdaten verknüpft.</li><li><b>Volltextsuche</b> mit zugelassenen Schreibvarianten (u/v/w, i/y/j, ſ/s, Doppelbuchstaben, Worttrennung am Zeilenende).</li></ul><h2>Was folgt</h2><p>Weitere Lesungen mit offenen und eigenen Modellen; die Gliederung in Einträge; für jeden Eintrag Datum, Titel (Delikt und Person), Kurzregest und Deliktlabels; Register mit Verknüpfung zu HLS, SSRQ und weiteren Normdaten; Auswertungen (gemeinsam auftretende Delikte, Karte, Delikte über die Zeit); TEI.</p><h2>Verantwortliche</h2><p><b>Herausgegeben von</b> Tobias Hodel, Dominic Weber, Jonas Widmer, Anna Funk und Myrjam Hostettler (Universität Bern).</p><p><b>Mitarbeit im Projekt «The Flow»:</b> Angela Huang, Silke Schwandt, Serena Tolino, Sefer Korkmaz, Christopher Kuhlmann, Inga Lange, Dana Meyer, Bart Holterman, Mohamed Ilyes Mechentel, Melvin Wilde, Judith Neubauer, Vivien Popken.</p><h2>Daten und Code</h2><p><a href=\"https://github.com/DHBern/turmbuecher-data\" target=\"_blank\" rel=\"noopener\">github.com/DHBern/turmbuecher-data</a>. Der Viewer ist aus dem der <a href=\"https://dhbern.github.io/sg-missiven-data/\" target=\"_blank\" rel=\"noopener\">St. Galler Missiven</a> abgeleitet.</p>",
   "nav.analysis": "Auswertung",
   "an.h1": "Auswertung",
-  "an.intro": "Welche Delikte die Turmbücher festhalten, wann und zusammen mit welchen anderen. Grundlage: {n} erschlossene Einträge aus {vols}.",
-  "an.caveat": "Alle Angaben sind maschinell erzeugt und ungeprüft: Ein offenes Sprachmodell ({model}) hat die Einträge abgegrenzt und ihnen Datum, Delikte und Ausgang zugeordnet – auf der Grundlage eines meist unkorrigierten, maschinell gelesenen Texts. Die Zahlen zeigen, was das Modell gelesen hat, nicht gesicherte Befunde. Ein Verhör, das ein früheres fortsetzt, ist ein eigener Eintrag.",
+  "an.intro": "Welche Delikte die Turmbücher festhalten, wann und zusammen mit welchen anderen. Grundlage: {n} erschlossene Einträge aus {vols} Bänden; die Erschliessung der übrigen läuft.",
+  "an.caveat": "Alle Angaben sind maschinell erzeugt und ungeprüft: Ein offenes Sprachmodell ({model}) hat die Einträge abgegrenzt und ihnen Datum, Delikte und Ausgang zugeordnet – auf der Grundlage eines meist unkorrigierten, maschinell gelesenen Texts. Die Zahlen zeigen, was das Modell gelesen hat, nicht gesicherte Befunde. Ein Verhör, das ein früheres fortsetzt, ist ein eigener Eintrag. Jahre gelten nur innerhalb der Spanne ihres Bandes: Ein Jahr, das genau 50 oder 100 Jahre daneben liegt, ist berichtigt; ein Eintrag ohne brauchbares Jahr trägt das des vorangehenden.",
   "an.filters": "Auswahl",
   "an.from": "von",
   "an.to": "bis",
@@ -159,5 +159,6 @@
   "facet.of": "Delikt (Entwurf)",
   "span.note": "Der Eintrag umfasst die hervorgehobenen Zeilen; der übrige Text der Seite gehört zu anderen Einträgen.",
   "unit.one": "Treffer",
-  "unit.other": "Treffer"
+  "unit.other": "Treffer",
+  "draft.year.read": "gelesen"
 }

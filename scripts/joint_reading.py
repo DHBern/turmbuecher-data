@@ -17,6 +17,10 @@ by eye in the viewer:
   word substitutions are voted on; insertions, deletions and line breaks stay
   as the backbone has them. One other reader alone never changes anything.
 
+Only pages where something was combined are written (two or more other
+readers, or no Transkribus text): elsewhere the joint reading would be the
+Transkribus text under another name.
+
 Writes ``readings/joint.jsonl``: ``key``, ``text``, ``backbone``, ``readers``
 (who else had read the page) and ``changes`` (line, from, to, by).
 The method is the St. Gallen Missives' weighted backbone
@@ -130,6 +134,8 @@ def main() -> None:
         else:
             joint, changes = text, []
             stats["backbone alone (fewer than two other readers)"] += 1
+        if bb == BACKBONE and len(have) < 2:
+            continue        # nothing was combined: the page has its Transkribus text, shown as such
         stats["words changed"] += len(changes)
         if bb != BACKBONE:
             stats["without Transkribus text"] += 1

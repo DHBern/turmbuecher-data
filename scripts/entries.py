@@ -44,7 +44,6 @@ import argparse
 import csv
 import json
 import re
-import statistics
 import sys
 import threading
 from concurrent.futures import ThreadPoolExecutor
@@ -121,7 +120,14 @@ def pages() -> list[dict]:
 def jsonl(path: Path) -> list[dict]:
     if not path.exists():
         return []
-    return [json.loads(x) for x in path.read_text(encoding="utf-8").splitlines() if x.strip()]
+    out = []
+    for x in path.read_text(encoding="utf-8").splitlines():
+        if x.strip():
+            try:
+                out.append(json.loads(x))
+            except ValueError:      # a run may be writing its last line right now
+                pass
+    return out
 
 
 def page_lines(reader: str) -> dict[str, list[tuple[str, bool]]]:
@@ -309,6 +315,105 @@ def make_title(c: dict) -> str:
     return f"{what} — {who}"
 
 
+WINDOW = 3          # a volume's years cluster within ± this many years of its centre
+SLIPS = (50, -50, 100, -100)   # the misreadings seen: a year off by exactly half a century or a century
+
+
+def vol_number(vol: str) -> int:
+    m = re.search(r"(\d+)", vol)
+    return int(m.group(1)) if m else 10 ** 6
+
+
+def volume_years(by_vol: dict[str, list[dict]], docs: dict[str, str]) -> list[str]:
+    """Give every described entry ``year`` and ``year_source``.
+
+    The volumes are in chronological order and each covers a few years. The
+    model reads many years wrong by exactly 50 or 100 (1520 for 1570, 1684 for
+    1584), so a year is believed only inside its volume's span:
+
+    * the span is the one in the volume's title where there is one; else the
+      densest cluster of the years read in the volume, and of several clusters
+      the one that fits between the neighbouring volumes;
+    * a year outside the span that falls inside it when moved by 50 or 100 is
+      corrected (``berichtigt``); any other year outside is dropped, and the
+      entry takes the year of the entry before it (``vom vorangehenden Eintrag``).
+    """
+    order = sorted((v for v in by_vol if re.match(r"^B IX \d+", v)), key=vol_number)
+    years = {v: [y for e in by_vol[v] if e["x"] and (y := year_of(e["x"]["datum"]))] for v in by_vol}
+    fixed = {v: title_span(docs[v]) for v in by_vol}
+
+    def clusters(v: str) -> list[tuple[int, int]]:
+        """(entries within the window, centre) for every year read, best first."""
+        ys = years[v]
+        return sorted(((sum(1 for y in ys if abs(y - c) <= WINDOW), c) for c in set(ys)), reverse=True)
+
+    centre: dict[str, float | None] = {}
+    for v in by_vol:
+        if fixed[v]:
+            centre[v] = sum(fixed[v]) / 2
+        else:
+            cl = clusters(v)
+            centre[v] = cl[0][1] if cl and len(years[v]) >= 5 else None
+
+    def neighbours(v: str) -> tuple[float | None, float | None]:
+        i = order.index(v)
+        before = next((centre[u] for u in reversed(order[:i]) if centre[u] is not None), None)
+        after = next((centre[u] for u in order[i + 1:] if centre[u] is not None), None)
+        return before, after
+
+    for _ in range(3):      # a wrong first guess next door settles within a few rounds
+        for v in order:
+            if fixed[v] or centre[v] is None:
+                continue
+            before, after = neighbours(v)
+            lo = (before if before is not None else -1e9) - 8
+            hi = (after if after is not None else 1e9) + 8
+            fits = [(n, c) for n, c in clusters(v) if lo <= c <= hi]
+            if fits:
+                centre[v] = fits[0][1]
+
+    report = []
+    for v, es in by_vol.items():
+        span = fixed[v]
+        src = "Titel"
+        if not span and centre[v] is not None:
+            before, after = neighbours(v) if v in order else (None, None)
+            # believable: near the centre, or between the neighbouring volumes' centres
+            near = [y for y in years[v] if abs(y - centre[v]) <= 2 * WINDOW
+                    or (before is not None and after is not None and before - 1 <= y <= after + 1)]
+            span, src = (min(near), max(near)), "gelesene Jahre und Nachbarbände"
+            slip = lambda y: any(span[0] <= y + d <= span[1] for d in SLIPS)  # noqa: E731
+            few = max(3, len(years[v]) // 10)
+            if v in order and v == order[-1]:       # nothing follows the last volume: it may run on
+                later = [y for y in years[v] if y > span[1] and not slip(y)]
+                if len(later) >= few:
+                    span = (span[0], max(later))
+            if v in order and v == order[0]:        # nor does anything precede the first
+                earlier = [y for y in years[v] if span[0] - 15 <= y < span[0] and not slip(y)]
+                if len(earlier) >= few:
+                    span = (min(earlier), span[1])
+        last, moved, dropped = None, 0, 0
+        for e in es:
+            if not e["x"]:
+                continue
+            y, source = year_of(e["x"]["datum"]), "genannt"
+            if y and span and not (span[0] - 1 <= y <= span[1] + 1):
+                alt = next((y + d for d in SLIPS if span[0] <= y + d <= span[1]), None)
+                if alt:
+                    y, source, moved = alt, "berichtigt (gelesen als %d)" % y, moved + 1
+                else:
+                    y, dropped = None, dropped + 1
+            if y and (span or len(years[v]) < 5):
+                e["year"], e["year_source"], last = y, source, y
+            elif last:
+                e["year"], e["year_source"] = last, "vom vorangehenden Eintrag"
+            else:
+                e["year"], e["year_source"] = None, ""
+        report.append(f"  {v}: {len(es)} entries, {sum(1 for e in es if e['x'])} described, span {span} "
+                      f"({src if span else '—'}), {moved} years corrected by 50/100, {dropped} dropped")
+    return report
+
+
 def build(args) -> None:
     entries = entry_list(args.reader)
     ext = {r["id"]: r for r in jsonl(ENT / "extract.jsonl") if "error" not in r and r.get("reader") == args.reader}
@@ -327,31 +432,7 @@ def build(args) -> None:
         e["model"] = r["model"] if r else ""
         by_vol.setdefault(e["volume"], []).append(e)
 
-    # years: within the volume's span (from its title, else from the bulk of the
-    # years read in it); a year outside is not believed and the last good one is kept
-    report = []
-    for vol, es in by_vol.items():
-        years = [y for e in es if e["x"] and (y := year_of(e["x"]["datum"]))]
-        span = title_span(docs[vol])
-        src = "Titel"
-        if not span and len(years) >= 5:
-            q = statistics.quantiles(years, n=10)
-            span, src = (int(q[0]) - 2, int(q[-1]) + 2), "gelesene Jahre"
-        last, out_of = None, 0
-        for e in es:
-            if not e["x"]:
-                continue
-            y = year_of(e["x"]["datum"])
-            if y and span and not (span[0] - 1 <= y <= span[1] + 1):
-                y, out_of = None, out_of + 1
-            if y:
-                e["year"], e["year_source"], last = y, "genannt", y
-            elif last:
-                e["year"], e["year_source"] = last, "vom vorangehenden Eintrag"
-            else:
-                e["year"], e["year_source"] = None, ""
-        report.append(f"  {vol}: {len(es)} entries, {sum(1 for e in es if e['x'])} described, span {span} ({src if span else '—'}), "
-                      f"{out_of} years outside the span dropped")
+    report = volume_years(by_vol, docs)
 
     ENT.mkdir(exist_ok=True)
     (ROOT / "regests").mkdir(exist_ok=True)
@@ -367,7 +448,8 @@ def build(args) -> None:
                       "spans": json.dumps(e["spans"], separators=(",", ":"))})
         if x and x["regest"]:
             drafts.append({"id": e["id"], "heading": title, "reader": args.reader, "model": e["model"],
-                           "draft": {"regest": x["regest"], "year": e.get("year"), "date_text": x["datum_text"],
+                           "draft": {"regest": x["regest"], "year": e.get("year"), "year_source": e.get("year_source", ""),
+                                     "date_text": x["datum_text"],
                                      "persons": x["personen"], "offences": x["delikte"], "place": ""}})
     for path, rows in ((ENT / "entries.jsonl", rec), (ROOT / "regests" / "drafts.jsonl", drafts)):
         tmp = path.with_suffix(".part")

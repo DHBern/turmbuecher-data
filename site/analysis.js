@@ -38,7 +38,7 @@ window.TBAnalysis = (() => {
     app.innerHTML = `
       <section class="intro">
         <h1>${esc(t("an.h1"))} <span class="badge proto">${esc(t("proto"))}</span></h1>
-        <p>${esc(t("an.intro", { n: num(D.entries.length), vols: D.volumes.join(", ") }))}</p>
+        <p>${esc(t("an.intro", { n: num(D.entries.length), vols: num(D.volumes.length) }))}</p>
         <p class="caveat">${esc(t("an.caveat", { model: D.model.join(", ") || "–" }))}</p>
       </section>
       <div class="anbar" role="group" aria-label="${esc(t("an.filters"))}">
