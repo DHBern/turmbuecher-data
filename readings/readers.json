@@ -1,0 +1,7 @@
+[
+ {"id": "transkribus-bestand",
+  "label": "Transkribus-Bestand",
+  "kind": "Arbeitstext aus Transkribus",
+  "about": "Der Text, der in der Transkribus-Sammlung 187323 («StABE_Turmbücher_DH_flow») steht, exportiert im November 2026. Er ist im Projekt «The Flow» entstanden: automatische Texterkennung, auf einem Teil der Seiten von Hand korrigiert. Welches Erkennungsmodell die einzelnen Seiten gelesen hat, ist in Transkribus nicht festgehalten.",
+  "caveat": "Kein geprüfter Editionstext. Seiten mit dem Status «GT» gelten im Projekt als Ground Truth; alle übrigen sind unkorrigierte Maschinenausgabe mit falsch gelesenen Wörtern, zusammengezogenen oder geteilten Zeilen und übersehenen Zeilen. Die Auszeichnungen von Personen, Orten und Daten stammen ebenfalls aus Transkribus; wer oder was sie gesetzt hat, ist dort nicht festgehalten."}
+]
