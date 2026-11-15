@@ -7,9 +7,10 @@ window.TBAnalysis = (() => {
   "use strict";
   const LIBS = ["https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js",
                 "https://cdnjs.cloudflare.com/ajax/libs/d3-sankey/0.12.3/d3-sankey.min.js"];
-  /* one fixed hue per offence group (identity), in this order; the last is neutral */
-  const GROUPS = ["Eigentum", "Gewalt", "Sittlichkeit", "Glaube und Magie", "Obrigkeit", "Lebensweise", "Sonstiges"];
-  const HUES = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#898781"];
+  /* one fixed hue per offence group (identity): groups and colours come from the
+     vocabulary (taxonomy/delikte.json → data/analysis.json), so a new group or
+     category needs no change here */
+  let GROUPS = [], HUES = [];
   const NEUTRAL = "#898781";
   let data = null, libs = null;
 
@@ -26,7 +27,10 @@ window.TBAnalysis = (() => {
     app.innerHTML = `<p class="loading">${esc(t("loading"))}</p>`;
     let D;
     try { D = await ready(json); } catch (e) { app.innerHTML = `<p>${esc(t("error.load"))}: ${esc(e.message)}</p>`; return; }
-    const hue = (o) => HUES[Math.max(0, GROUPS.indexOf(D.offences[o].group))];
+    GROUPS = D.groups.map((g) => g.id);
+    HUES = D.groups.map((g) => g.farbe || NEUTRAL);
+    const gi = (name) => { const i = GROUPS.indexOf(name); return i < 0 ? GROUPS.length - 1 : i; };
+    const hue = (o) => HUES[gi(D.offences[o].group)];
     const dated = D.entries.filter((e) => e[1]);
     const yMin = d3.min(dated, (e) => e[1]), yMax = d3.max(dated, (e) => e[1]);
     const ui = { from: yMin, to: yMax, cont: store.get("an.cont", true), right: store.get("an.right", "co"), vol: "" };
@@ -168,7 +172,7 @@ window.TBAnalysis = (() => {
         const r = at.get(binOf(e[1], b));
         if (!r) continue;
         r.n += 1;
-        for (const o of e[2]) { r.g[Math.max(0, GROUPS.indexOf(D.offences[o].group))] += 1; r.tot += 1; }
+        for (const o of e[2]) { r.g[gi(D.offences[o].group)] += 1; r.tot += 1; }
       }
       const W = Math.max(760, el.clientWidth || 900), H = 300, m = { l: 44, r: 12, t: 10, b: 40 };
       const x = d3.scaleBand().domain(bins).range([m.l, W - m.r]).paddingInner(0.25).paddingOuter(0.1);
@@ -214,7 +218,7 @@ window.TBAnalysis = (() => {
       const svg = d3.select(el).append("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("width", W).attr("height", H).attr("role", "img").attr("aria-label", t("an.count.h2"));
       const row = svg.selectAll("g").data(list).join("g").attr("transform", (d, i) => `translate(0,${m.t + i * rh})`);
       row.append("text").attr("class", "blabel").attr("x", m.l - 8).attr("y", rh / 2).attr("dy", "0.35em").attr("text-anchor", "end").text((d) => d.label);
-      row.append("rect").attr("x", m.l).attr("y", 5).attr("height", rh - 10).attr("width", (d) => Math.max(2, x(d.n) - m.l)).attr("rx", 3).attr("fill", (d) => HUES[Math.max(0, GROUPS.indexOf(d.group))]);
+      row.append("rect").attr("x", m.l).attr("y", 5).attr("height", rh - 10).attr("width", (d) => Math.max(2, x(d.n) - m.l)).attr("rx", 3).attr("fill", (d) => HUES[gi(d.group)]);
       row.append("text").attr("class", "bval").attr("x", (d) => x(d.n) + 6).attr("y", rh / 2).attr("dy", "0.35em").text((d) => num(d.n));
       row.append("rect").attr("class", "hit").attr("x", 0).attr("y", 0).attr("width", W).attr("height", rh)
         .on("mousemove", (ev, d) => showTip(ev, `<b>${esc(d.label)}</b><div>${esc(d.group)}</div><div>${nEntries(d.n)} (${(100 * d.n / es.length).toLocaleString(t("locale"), { maximumFractionDigits: 1 })} %)</div>`))

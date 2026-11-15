@@ -253,10 +253,17 @@ def write_analysis() -> None:
             continue
         if e["volume"] not in vols:
             vols.append(e["volume"])
-        rows.append([e["id"], e.get("year"), [off.index(o) for o in e["delikte"]],
+        rows.append([e["id"], e.get("year"), [off.index(o) for o in e["delikte"] if o in off],
                      [san.index(x) for x in e["sanktionen"]], 1 if e.get("fortsetzung") else 0,
                      vols.index(e["volume"]), e.get("title", "")])
-    out = {"offences": [{"id": d["id"], "label": d["label"], "group": d["gruppe"]} for d in tax["delikte"]],
+    known = [g["id"] for g in tax.get("gruppen") or []]
+    groups = [dict(g) for g in tax.get("gruppen") or []]
+    for d in tax["delikte"]:            # a group named only on a category: listed, neutral colour
+        if d["gruppe"] not in known:
+            known.append(d["gruppe"])
+            groups.append({"id": d["gruppe"], "farbe": "#898781"})
+    out = {"version": tax.get("version", 1), "groups": groups,
+           "offences": [{"id": d["id"], "label": d["label"], "group": d["gruppe"]} for d in tax["delikte"]],
            "sanctions": [{"id": d["id"], "label": d["label"]} for d in tax["sanktionen"]],
            "volumes": vols, "entries": rows,
            "model": sorted({json.loads(x)["model"] for x in path.read_text(encoding="utf-8").splitlines() if json.loads(x).get("model")})}

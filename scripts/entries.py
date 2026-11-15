@@ -3,6 +3,8 @@
     python scripts/entries.py segment [--volumes "B IX 467"] [--reader transkribus-bestand]
     python scripts/entries.py extract [--volumes …]
     python scripts/entries.py build
+    python scripts/entries.py relabel             # after the vocabulary has grown
+    python scripts/entries.py vorschlaege         # what the vocabulary does not cover yet
 
 Three steps, each resumable (a page or entry already answered is not asked again):
 
@@ -18,6 +20,18 @@ Three steps, each resumable (a page or entry already answered is not asked again
              title from the fields (never free text), and writes
              ``entries/entries.jsonl`` (the record), ``readings/units.tsv`` (the
              viewer's units) and ``regests/drafts.jsonl`` (title and regest).
+
+``relabel``  The vocabulary is meant to grow (taxonomy/README.md). Every answer
+             records the vocabulary ``version`` it was given under; after the
+             version is raised, ``relabel`` asks again for the **offences only**
+             of the entries labelled under an older version, showing the model
+             the labels the entry has and the categories added since, and
+             writes them to ``entries/labels.jsonl``; ``build`` lets the newest
+             labels win. Dates, persons and regests are not redone.
+``vorschlaege`` Lists what the model could not place (``sonstiges``, ``unklar``)
+             with the source's own words and the category the model would have
+             wanted, most frequent first → ``entries/vorschlaege.tsv``: the
+             material for the next category.
 
 Everything here is a machine's work on a mostly uncorrected machine reading.
 Nothing is checked by a person; every output says which model and reading it
@@ -45,7 +59,9 @@ CONTEXT_LINES = 12
 MAX_HEAD, MAX_TAIL = 9000, 2000
 WORKERS = 6
 TAX = json.loads((ROOT / "taxonomy" / "delikte.json").read_text(encoding="utf-8"))
+VERSION = int(TAX.get("version") or 1)
 OFF = {d["id"]: d for d in TAX["delikte"]}
+ALIAS = {a: d["id"] for d in TAX["delikte"] for a in d.get("alias") or []}   # earlier ids of a category
 PROC = {d["id"]: d for d in TAX["verfahren"]}
 SANC = {d["id"]: d for d in TAX["sanktionen"]}
 
@@ -74,6 +90,7 @@ Antworte nur mit einem JSON-Objekt mit genau diesen Feldern:
  "personen": [{"name": Name in lesbarer, quellennaher Schreibung, "rolle": "beschuldigt" | "opfer" | "zeuge" | "amtsperson" | "andere", "herkunft": Ort oder null, "geschlecht": "m" | "w" | "u"}],
  "delikte": [Kennungen aus der Liste unten; alle Vorwürfe gegen die beschuldigte Person, höchstens 4, der wichtigste zuerst],
  "delikt_woertlich": der Vorwurf mit den Worten der Quelle, kurz, oder null,
+ "delikt_vorschlag": nur wenn kein Delikt der Liste passt ("sonstiges"): eine kurze heutige Bezeichnung für die fehlende Kategorie, sonst null,
  "verfahren": [Kennungen aus der Liste; "peinlich" nur, wenn Folter oder peinliche Befragung genannt ist],
  "sanktionen": [Kennungen aus der Liste; nur, was der Text als Urteil oder Ausgang nennt],
  "orte": [Orte, an denen etwas geschah oder aus denen Personen stammen, in heutiger Schreibung, wo sie sicher erkennbar ist, sonst wie in der Quelle],
@@ -239,7 +256,7 @@ def extract(args) -> None:
         if not isinstance(ans, dict):
             raise ValueError("not an object")
         log.add({"id": e["id"], "spans": e["spans"], "chars": len(text), "reader": args.reader,
-                 "model": llm.MODEL, "x": ans})
+                 "model": llm.MODEL, "tax": VERSION, "x": ans})
 
     run(todo, work, "extract")
 
@@ -258,7 +275,8 @@ def title_span(doc: str) -> tuple[int, int] | None:
 def clean(x: dict) -> dict:
     """Keep only what the schema allows; unknown codes are dropped, never guessed."""
     def codes(v, allowed):
-        return [c for c in dict.fromkeys(v if isinstance(v, list) else []) if c in allowed]
+        v = [ALIAS.get(c, c) if isinstance(c, str) else c for c in (v if isinstance(v, list) else [])]
+        return [c for c in dict.fromkeys(v) if isinstance(c, str) and c in allowed]
     persons = []
     for p in x.get("personen") if isinstance(x.get("personen"), list) else []:
         if isinstance(p, dict) and str(p.get("name") or "").strip():
@@ -272,6 +290,7 @@ def clean(x: dict) -> dict:
     return {"art": str(x.get("art") or ""), "datum_text": str(x.get("datum_text") or "").strip(),
             "datum": str(x.get("datum") or "").strip(), "personen": persons, "delikte": off,
             "delikt_woertlich": str(x.get("delikt_woertlich") or "").strip(),
+            "delikt_vorschlag": str(x.get("delikt_vorschlag") or "").strip(),
             "verfahren": codes(x.get("verfahren"), PROC), "sanktionen": codes(x.get("sanktionen"), SANC),
             "orte": [str(o).strip() for o in (x.get("orte") if isinstance(x.get("orte"), list) else []) if str(o).strip()],
             "regest": str(x.get("regest") or "").strip(), "fortsetzung": bool(x.get("fortsetzung"))}
@@ -295,9 +314,16 @@ def build(args) -> None:
     ext = {r["id"]: r for r in jsonl(ENT / "extract.jsonl") if "error" not in r and r.get("reader") == args.reader}
     docs = {p["volume"]: p["doc"] for p in pages()}
     by_vol: dict[str, list[dict]] = {}
+    labels = {r["id"]: r for r in jsonl(ENT / "labels.jsonl") if "error" not in r}   # the latest line per entry wins
     for e in entries:
         r = ext.get(e["id"])
         e["x"] = clean(r["x"]) if r else None
+        e["tax"] = int(r.get("tax") or 1) if r else None
+        lab = labels.get(e["id"])
+        if e["x"] and lab and int(lab.get("tax") or 1) >= e["tax"]:
+            e["x"]["delikte"] = clean({"delikte": lab["delikte"]})["delikte"]
+            e["x"]["delikt_vorschlag"] = str(lab.get("vorschlag") or "").strip()
+            e["tax"] = int(lab.get("tax") or 1)
         e["model"] = r["model"] if r else ""
         by_vol.setdefault(e["volume"], []).append(e)
 
@@ -336,7 +362,7 @@ def build(args) -> None:
         title = make_title(x) if x and x["art"] != "register" else ""
         rec.append({"id": e["id"], "volume": e["volume"], "nr": e["nr"], "kind": (x or {}).get("art") or e["kind"],
                     "spans": e["spans"], "year": e.get("year"), "year_source": e.get("year_source", ""),
-                    "title": title, "reader": args.reader, "model": e["model"], **(x or {})})
+                    "title": title, "reader": args.reader, "model": e["model"], "tax": e.get("tax"), **(x or {})})
         units.append({"id": e["id"], "shelf": e["volume"], "nr": e["nr"], "title": "", "pages": ";".join(keys),
                       "spans": json.dumps(e["spans"], separators=(",", ":"))})
         if x and x["regest"]:
@@ -351,17 +377,87 @@ def build(args) -> None:
         w = csv.DictWriter(fh, fieldnames=list(units[0]), delimiter="\t", lineterminator="\n")
         w.writeheader()
         w.writerows(units)
-    print(f"{len(rec)} entries, {len(drafts)} with a regest")
+    old = sum(1 for e in entries if e["x"] and e["tax"] < VERSION)
+    print(f"{len(rec)} entries, {len(drafts)} with a regest; vocabulary version {VERSION}"
+          + (f", {old} entries still labelled under an older version (run: entries.py relabel)" if old else ""))
     print("\n".join(report))
+
+
+# ---------- the vocabulary grows ----------
+REL_SYSTEM = """Du prüfst die Delikt-Zuordnung eines Eintrags aus einem Berner Turmbuch (Verhörprotokolle der Berner Obrigkeit, 16.–18. Jahrhundert, frühneuhochdeutsch, maschinell gelesen mit Lesefehlern). Das Vokabular ist um Kategorien erweitert worden.
+
+Du bekommst den Eintrag, die BISHERIGE Zuordnung und die NEUEN Kategorien. Behalte die bisherige Zuordnung bei. Ändere sie nur, wo eine neue Kategorie einen Vorwurf des Eintrags trifft: Füge sie hinzu, und nimm "sonstiges", "unklar" oder eine bisherige Kategorie nur dann heraus, wenn die neue genau diesen Vorwurf besser bezeichnet. Höchstens 4 Delikte, der wichtigste Vorwurf zuerst.
+
+Antworte nur mit JSON: {"delikte": [Kennungen aus der Liste], "vorschlag": nur wenn weiterhin kein Delikt der Liste passt ("sonstiges"): eine kurze heutige Bezeichnung für die fehlende Kategorie, sonst null}
+
+ALLE DELIKTE:
+%s""" % "\n".join(f"- {d['id']}: {d['label']} ({d['hinweis']})" for d in TAX["delikte"])
+
+
+def relabel(args) -> None:
+    """Offences again for entries labelled under an older vocabulary version:
+    the model sees the labels the entry has and the categories added since
+    (``seit`` in taxonomy/delikte.json), and is told to change nothing else.
+    One short call per entry; dates, persons and regests are not redone."""
+    lines = page_lines(args.reader)
+    want = {p["volume"] for p in selected(args)}
+    ext = {r["id"]: r for r in jsonl(ENT / "extract.jsonl") if "error" not in r and r.get("reader") == args.reader}
+    labels = {r["id"]: r for r in jsonl(ENT / "labels.jsonl") if "error" not in r}
+    log = Log(ENT / "labels.jsonl", "id")
+    todo = []
+    for e in entry_list(args.reader):
+        r = ext.get(e["id"])
+        if not r or e["volume"] not in want:
+            continue
+        lab = labels.get(e["id"])
+        e["at"] = max(int(r.get("tax") or 1), int(lab.get("tax") or 1) if lab else 0)
+        e["now"] = clean({"delikte": (lab or {}).get("delikte") if lab and int(lab.get("tax") or 1) >= int(r.get("tax") or 1)
+                          else (r["x"].get("delikte") if isinstance(r.get("x"), dict) else [])})["delikte"]
+        if not e["now"]:            # no offence so far (a register, a note): nothing to extend
+            continue
+        if e["at"] < VERSION or args.force:
+            todo.append(e)
+
+    def work(e: dict) -> None:
+        new = [d for d in TAX["delikte"] if int(d.get("seit") or 1) > e["at"]] or TAX["delikte"]
+        text = entry_text(e, lines)
+        if len(text) > MAX_HEAD + MAX_TAIL:
+            text = text[:MAX_HEAD] + "\n[…]\n" + text[-MAX_TAIL:]
+        user = ("BISHERIGE Zuordnung: " + json.dumps(e["now"], ensure_ascii=False) + "\nNEUE Kategorien: " +
+                "; ".join(f"{d['id']} ({d['label']}: {d['hinweis']})" for d in new) + f"\n\nEINTRAG:\n{text}")
+        ans = llm.parse_json(llm.chat(REL_SYSTEM, user, 200))
+        log.add({"id": e["id"], "delikte": ans.get("delikte") if isinstance(ans.get("delikte"), list) else e["now"],
+                 "vorschlag": ans.get("vorschlag"), "tax": VERSION, "model": llm.MODEL})
+
+    print(f"vocabulary version {VERSION}: {len(todo)} entries to label again")
+    run(todo, work, "relabel")
+
+
+def vorschlaege(args) -> None:
+    """entries/vorschlaege.tsv: the entries no category fits, grouped by what
+    the model would have called them."""
+    rows = [e for e in jsonl(ENT / "entries.jsonl") if set(e.get("delikte") or []) & {"sonstiges", "unklar"}]
+    groups: dict[str, list[dict]] = {}
+    for e in rows:
+        groups.setdefault((e.get("delikt_vorschlag") or "").strip().lower() or "(kein Vorschlag)", []).append(e)
+    path = ENT / "vorschlaege.tsv"
+    with path.open("w", encoding="utf-8", newline="") as fh:
+        w = csv.writer(fh, delimiter="\t", lineterminator="\n")
+        w.writerow(["vorschlag", "eintraege", "beispiele", "woertlich"])
+        for k, es in sorted(groups.items(), key=lambda kv: -len(kv[1])):
+            w.writerow([k, len(es), " ".join(e["id"] for e in es[:5]),
+                        " | ".join(dict.fromkeys(e.get("delikt_woertlich", "")[:80] for e in es if e.get("delikt_woertlich")))[:400]])
+    print(f"{len(rows)} entries without a fitting category, {len(groups)} proposals → {path.relative_to(ROOT)}")
 
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("step", choices=["segment", "extract", "build"])
+    ap.add_argument("step", choices=["segment", "extract", "build", "relabel", "vorschlaege"])
     ap.add_argument("--volumes", default="")
     ap.add_argument("--reader", default="transkribus-bestand")
+    ap.add_argument("--force", action="store_true", help="relabel: also entries already labelled under the current version")
     args = ap.parse_args()
-    {"segment": segment, "extract": extract, "build": build}[args.step](args)
+    {"segment": segment, "extract": extract, "build": build, "relabel": relabel, "vorschlaege": vorschlaege}[args.step](args)
 
 
 if __name__ == "__main__":
