@@ -1,5 +1,5 @@
 {
- "_": "Bekannte Laufzeiten der Bände. Ein Eintrag hier geht den aus den gelesenen Jahren erschlossenen Spannen vor (scripts/entries.py, volume_years). B IX 422–492: Online-Archivkatalog des Staatsarchivs des Kantons Bern, Serie «Turmbücher (1545–1747)», abgeschrieben am 16.11.2026. Bandname wie in readings/pages.tsv (Spalte volume).",
+ "_": "Bekannte Laufzeiten der Bände. Ein Eintrag hier geht den aus den gelesenen Jahren erschlossenen Spannen vor (scripts/entries.py, volume_years). B IX 422–492: Online-Archivkatalog des Staatsarchivs des Kantons Bern, Serie «Turmbücher (1545–1747)», abgeschrieben am 16.11.2026. Bandname wie in readings/pages.tsv (Spalte volume). B IX 493–509 haben im Katalog keine Laufzeit (Auskunft Tobias Hodel, 16.11.2026): ihre Spannen werden aus den gelesenen Jahren und den Nachbarbänden erschlossen.",
  "Henzi": {
   "von": 1749,
   "bis": 1749,
