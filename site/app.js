@@ -156,7 +156,7 @@
         if (!us.length) return "";
         const isOpen = open.has(v.v) || (words.length && rows.length <= 200);
         return `<details class="vol" data-vol="${esc(v.v)}" ${isOpen ? "open" : ""}>
-          <summary><span class="shelf">${esc(v.doc)}</span> <span class="muted small">${esc(t("list.vol.meta", { pages: num(v.pages), text: num(v.text), gt: num(v.gt), entries: num(units.filter((u) => u.shelf === v.v && !u.p).length) }))}</span></summary>
+          <summary><span class="shelf">${esc(v.doc)}</span>${v.serie ? ` <span class="badge serie">${esc(v.serie)}</span>` : ""} <span class="muted small">${esc(t("list.vol.meta", { pages: num(v.pages), text: num(v.text), gt: num(v.gt), entries: num(units.filter((u) => u.shelf === v.v && !u.p).length) }))}</span></summary>
           <div class="list">${isOpen ? us.map((u) => unitRow(u)).join("") : ""}</div></details>`;
       }).join("") || `<p class="empty">${esc(t("list.none"))}</p>`;
     };

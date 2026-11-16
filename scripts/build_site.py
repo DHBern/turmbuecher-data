@@ -373,9 +373,12 @@ def main() -> None:
             by_id[b]["disagreement"][a] = x
 
     shards = write_search(letters, readings, ids)
+    series = json.loads((ROOT / "taxonomy" / "bandjahre.json").read_text(encoding="utf-8"))
+    series = {k: v for k, v in series.items() if isinstance(v, dict)}
     vols: dict[str, dict] = {}
     for p in pages.values():
-        v = vols.setdefault(p["volume"], {"v": p["volume"], "doc": p["volume"] if p["volume"] == "Henzi" else p["doc"], "pages": 0, "gt": 0, "text": 0})
+        v = vols.setdefault(p["volume"], {"v": p["volume"], "doc": p["volume"] if p["volume"] == "Henzi" else p["doc"],
+                                          "serie": (series.get(p["volume"]) or {}).get("serie", ""), "pages": 0, "gt": 0, "text": 0})
         v["pages"] += 1
         v["gt"] += p.get("status") in ("GT", "DONE", "FINAL")
         v["text"] += int(p.get("text_lines") or 0) > 0

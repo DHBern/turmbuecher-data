@@ -1,5 +1,5 @@
 {
- "_": "Bekannte Laufzeiten der Bände. Ein Eintrag hier geht den aus den gelesenen Jahren erschlossenen Spannen vor (scripts/entries.py, volume_years). B IX 422–492: Online-Archivkatalog des Staatsarchivs des Kantons Bern, Serie «Turmbücher (1545–1747)», abgeschrieben am 16.11.2026. Bandname wie in readings/pages.tsv (Spalte volume). B IX 493–509 haben im Katalog keine Laufzeit (Auskunft Tobias Hodel, 16.11.2026): ihre Spannen werden aus den gelesenen Jahren und den Nachbarbänden erschlossen.",
+ "_": "Bekannte Laufzeiten und Serien der Bände. Eine Laufzeit hier geht den aus den gelesenen Jahren erschlossenen Spannen vor (scripts/entries.py, volume_years). Online-Archivkatalog des Staatsarchivs des Kantons Bern, abgeschrieben am 16.11.2026: B IX 422–492 Serie «Turmbücher (1545–1747)», B IX 493–504 Serie «Gross-Turmbücher (1749–1799)», B IX 505–509 Serie «Klein-Turmbücher (1694–1799)» (die Serie reicht im Katalog bis B IX 547; die Transkribus-Sammlung enthält nur bis B IX 509). Der Band «Henzi» steht in keiner Serie des Katalogausschnitts; 1749 ist eine Annahme. Bandname wie in readings/pages.tsv (Spalte volume).",
  "Henzi": {
   "von": 1749,
   "bis": 1749,
@@ -8,356 +8,529 @@
  "B IX 422": {
   "von": 1545,
   "bis": 1555,
-  "quelle": "StABE-Katalog (Band 1545 - 1546 und 1552 - 1555)"
+  "quelle": "StABE-Katalog (Band 1545 - 1546 und 1552 - 1555)",
+  "serie": "Turmbücher"
  },
  "B IX 423": {
   "von": 1551,
   "bis": 1552,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 424": {
   "von": 1555,
   "bis": 1559,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 425": {
   "von": 1560,
   "bis": 1561,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 426": {
   "von": 1561,
   "bis": 1562,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 427": {
   "von": 1563,
   "bis": 1563,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 428": {
   "von": 1564,
   "bis": 1566,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 429": {
   "von": 1566,
   "bis": 1567,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 430": {
   "von": 1567,
   "bis": 1568,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 431": {
   "von": 1568,
   "bis": 1569,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 432": {
   "von": 1569,
   "bis": 1570,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 433": {
   "von": 1570,
   "bis": 1570,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 434": {
   "von": 1571,
   "bis": 1572,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 435": {
   "von": 1573,
   "bis": 1574,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 436": {
   "von": 1574,
   "bis": 1575,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 437": {
   "von": 1575,
   "bis": 1575,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 438": {
   "von": 1575,
   "bis": 1576,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 439": {
   "von": 1576,
   "bis": 1577,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 440": {
   "von": 1577,
   "bis": 1577,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 441": {
   "von": 1576,
   "bis": 1580,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 442": {
   "von": 1577,
   "bis": 1580,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 443": {
   "von": 1580,
   "bis": 1581,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 444": {
   "von": 1582,
   "bis": 1583,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 445": {
   "von": 1583,
   "bis": 1583,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 446": {
   "von": 1584,
   "bis": 1585,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 447": {
   "von": 1585,
   "bis": 1585,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 448": {
   "von": 1585,
   "bis": 1586,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 449": {
   "von": 1586,
   "bis": 1587,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 450": {
   "von": 1587,
   "bis": 1587,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 451": {
   "von": 1587,
   "bis": 1589,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 452": {
   "von": 1589,
   "bis": 1592,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 453": {
   "von": 1592,
   "bis": 1595,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 454": {
   "von": 1596,
   "bis": 1599,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 455": {
   "von": 1600,
   "bis": 1601,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 456": {
   "von": 1601,
   "bis": 1602,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 457": {
   "von": 1605,
   "bis": 1607,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 458": {
   "von": 1608,
   "bis": 1611,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 459": {
   "von": 1611,
   "bis": 1612,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 460": {
   "von": 1613,
   "bis": 1617,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 461": {
   "von": 1617,
   "bis": 1622,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 462": {
   "von": 1622,
   "bis": 1624,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 463": {
   "von": 1624,
   "bis": 1627,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 464": {
   "von": 1627,
   "bis": 1629,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 465": {
   "von": 1629,
   "bis": 1630,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 466": {
   "von": 1631,
   "bis": 1632,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 467": {
   "von": 1635,
   "bis": 1638,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 468": {
   "von": 1638,
   "bis": 1641,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 469": {
   "von": 1641,
   "bis": 1644,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 470": {
   "von": 1644,
   "bis": 1647,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 471": {
   "von": 1647,
   "bis": 1648,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 472": {
   "von": 1648,
   "bis": 1650,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 473": {
   "von": 1650,
   "bis": 1653,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 474": {
   "von": 1650,
   "bis": 1653,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 475": {
   "von": 1653,
   "bis": 1653,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 476": {
   "von": 1653,
   "bis": 1656,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 477": {
   "von": 1657,
   "bis": 1660,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 478": {
   "von": 1660,
   "bis": 1663,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 479": {
   "von": 1664,
   "bis": 1665,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 480": {
   "von": 1666,
   "bis": 1669,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 481": {
   "von": 1669,
   "bis": 1672,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 482": {
   "von": 1672,
   "bis": 1675,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 483": {
   "von": 1675,
   "bis": 1678,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 484": {
   "von": 1681,
   "bis": 1684,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 485": {
   "von": 1684,
   "bis": 1690,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 486": {
   "von": 1704,
   "bis": 1711,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 487": {
   "von": 1711,
   "bis": 1721,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 488": {
   "von": 1721,
   "bis": 1722,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 489": {
   "von": 1722,
   "bis": 1726,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 490": {
   "von": 1727,
   "bis": 1729,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 491": {
   "von": 1730,
   "bis": 1737,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
  },
  "B IX 492": {
   "von": 1739,
   "bis": 1747,
-  "quelle": "StABE-Katalog"
+  "quelle": "StABE-Katalog",
+  "serie": "Turmbücher"
+ },
+ "B IX 493": {
+  "von": 1749,
+  "bis": 1749,
+  "quelle": "StABE-Katalog",
+  "serie": "Gross-Turmbücher"
+ },
+ "B IX 494": {
+  "von": 1751,
+  "bis": 1753,
+  "quelle": "StABE-Katalog",
+  "serie": "Gross-Turmbücher"
+ },
+ "B IX 495": {
+  "von": 1753,
+  "bis": 1758,
+  "quelle": "StABE-Katalog",
+  "serie": "Gross-Turmbücher"
+ },
+ "B IX 496": {
+  "von": 1759,
+  "bis": 1765,
+  "quelle": "StABE-Katalog",
+  "serie": "Gross-Turmbücher"
+ },
+ "B IX 497": {
+  "von": 1769,
+  "bis": 1771,
+  "quelle": "StABE-Katalog",
+  "serie": "Gross-Turmbücher"
+ },
+ "B IX 498": {
+  "von": 1771,
+  "bis": 1779,
+  "quelle": "StABE-Katalog",
+  "serie": "Gross-Turmbücher"
+ },
+ "B IX 499": {
+  "von": 1780,
+  "bis": 1783,
+  "quelle": "StABE-Katalog",
+  "serie": "Gross-Turmbücher"
+ },
+ "B IX 500": {
+  "von": 1783,
+  "bis": 1789,
+  "quelle": "StABE-Katalog",
+  "serie": "Gross-Turmbücher"
+ },
+ "B IX 501": {
+  "von": 1788,
+  "bis": 1795,
+  "quelle": "StABE-Katalog",
+  "serie": "Gross-Turmbücher"
+ },
+ "B IX 502": {
+  "von": 1794,
+  "bis": 1798,
+  "quelle": "StABE-Katalog",
+  "serie": "Gross-Turmbücher"
+ },
+ "B IX 503": {
+  "von": 1798,
+  "bis": 1799,
+  "quelle": "StABE-Katalog",
+  "serie": "Gross-Turmbücher"
+ },
+ "B IX 504": {
+  "von": 1799,
+  "bis": 1799,
+  "quelle": "StABE-Katalog (Band 1799, März - August)",
+  "serie": "Gross-Turmbücher"
+ },
+ "B IX 505": {
+  "von": 1697,
+  "bis": 1713,
+  "quelle": "StABE-Katalog",
+  "serie": "Klein-Turmbücher"
+ },
+ "B IX 506": {
+  "von": 1702,
+  "bis": 1705,
+  "quelle": "StABE-Katalog",
+  "serie": "Klein-Turmbücher"
+ },
+ "B IX 507": {
+  "von": 1706,
+  "bis": 1711,
+  "quelle": "StABE-Katalog",
+  "serie": "Klein-Turmbücher"
+ },
+ "B IX 508": {
+  "von": 1711,
+  "bis": 1716,
+  "quelle": "StABE-Katalog",
+  "serie": "Klein-Turmbücher"
+ },
+ "B IX 509": {
+  "von": 1713,
+  "bis": 1715,
+  "quelle": "StABE-Katalog",
+  "serie": "Klein-Turmbücher"
  }
 }

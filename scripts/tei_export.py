@@ -38,6 +38,7 @@ import register as reg  # noqa: E402
 
 IIIF = "https://files.transkribus.eu/iiif/2/"
 SITE = "https://dhbern.github.io/turmbuecher-data/"
+SERIE_SINGULAR = {"Turmbücher": "Turmbuch", "Gross-Turmbücher": "Gross-Turmbuch", "Klein-Turmbücher": "Klein-Turmbuch"}
 TAG = {"per": "persName", "place": "placeName", "org": "orgName", "date": "date"}
 TOKEN = re.compile(r"\S+")
 
@@ -56,7 +57,7 @@ def a(**attrs) -> str:
     return "".join(f" {k.replace('__', ':').rstrip('_')}={quoteattr(str(v))}" for k, v in attrs.items() if v not in (None, ""))
 
 
-def header(vol: str, doc: str, span, tax: dict, people: dict, models: list[str], today: str) -> str:
+def header(vol: str, doc: str, span, tax: dict, people: dict, models: list[str], today: str, serie: str = "") -> str:
     def person(p, tag):
         orcid = f'<idno type="ORCID">https://orcid.org/{p["orcid"]}</idno>' if p.get("orcid") else ""
         inner = f'<persName>{escape(p["name"])}</persName>{orcid}<affiliation>{escape(p["ort"])}</affiliation>'
@@ -76,7 +77,7 @@ def header(vol: str, doc: str, span, tax: dict, people: dict, models: list[str],
     return f"""<teiHeader>
 <fileDesc>
 <titleStmt>
-<title>Berner Turmbuch {escape(doc if vol.startswith("B IX") else vol)}: maschinelle Lesung und Erschliessung</title>
+<title>Berner {SERIE_SINGULAR.get(serie, "Turmbuch")} {escape(doc if vol.startswith("B IX") else vol)}: maschinelle Lesung und Erschliessung</title>
 {"".join(person(p, "editor") for p in people["herausgebende"])}
 <respStmt><resp>Mitarbeit im Projekt «The Flow» (flow-project.net)</resp>{"".join(person(p, "name") for p in people["mitarbeitende"])}</respStmt>
 <respStmt xml:id="transkribus"><resp>Text, Zeilen und Auszeichnungen aus der Transkribus-Sammlung 187323 «StABE_Turmbücher_DH_flow»: automatische Texterkennung, auf einem Teil der Seiten von Hand korrigiert (Projekt «The Flow»)</resp><name type="software">Transkribus</name></respStmt>
@@ -92,8 +93,8 @@ def header(vol: str, doc: str, span, tax: dict, people: dict, models: list[str],
 <idno type="URI">{SITE}</idno>
 <availability><licence target="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0. Die Bilder der Vorlage sind gemeinfrei (Staatsarchiv des Kantons Bern).</licence></availability>
 </publicationStmt>
-<sourceDesc><msDesc><msIdentifier><settlement>Bern</settlement><repository>Staatsarchiv des Kantons Bern (StABE)</repository><idno>{escape(shelf)}</idno></msIdentifier>
-<msContents><summary>Turmbuch: Verhöre, Geständnisse und Urteile der Berner Obrigkeit.</summary></msContents>
+<sourceDesc><msDesc><msIdentifier><settlement>Bern</settlement><repository>Staatsarchiv des Kantons Bern (StABE)</repository>{f"<collection>{escape(serie)}</collection>" if serie else ""}<idno>{escape(shelf)}</idno></msIdentifier>
+<msContents><summary>{SERIE_SINGULAR.get(serie, "Turmbuch")}: Verhöre, Geständnisse und Urteile der Berner Obrigkeit.</summary></msContents>
 <history><origin>{when}</origin></history></msDesc></sourceDesc>
 </fileDesc>
 <encodingDesc>
@@ -166,6 +167,7 @@ def main() -> None:
                 if h["grade"] == "wahrscheinlich" or (eid, r["key"]) not in hls_of:
                     hls_of[(eid, r["key"])] = h
 
+    known = {k: v for k, v in json.loads((ROOT / "taxonomy" / "bandjahre.json").read_text(encoding="utf-8")).items() if isinstance(v, dict)}
     by_vol: dict[str, list[dict]] = {}
     for e in entries:
         by_vol.setdefault(e["volume"], []).append(e)
@@ -274,7 +276,7 @@ def main() -> None:
 
         name = re.sub(r"[^A-Za-z0-9]+", "_", vol) + ".xml"
         xml = (f'<?xml version="1.0" encoding="UTF-8"?>\n<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="{xid(name[:-4])}">\n' +
-               header(vol, doc, span, tax, people, models, today) +
+               header(vol, doc, span, tax, people, models, today, (known.get(vol) or {}).get("serie", "")) +
                f'\n<facsimile>\n{chr(10).join(fac)}\n</facsimile>\n<text><body>\n' + "\n".join(divs) + "\n</body></text>\n</TEI>\n")
         tmp = args.out / (name + ".part")
         tmp.write_text(xml, encoding="utf-8")
