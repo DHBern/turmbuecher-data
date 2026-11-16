@@ -1,0 +1,344 @@
+{
+ "_": "Made on 16.11.2026 by looking up the 38 persons of _ingest/hls_fuer_ssrq.json by family name and source spellings in the SSRQ person authority file and the Königsfelden person register through their MCP servers (search_persons, search_name_index, get_person); a link is confirmed only where the record's first_year/last_year (SSRQ) or birth/death (KF) agree with the HLS life dates within 2 years on at least one date, since neither register carries HLS or GND ids for persons.",
+ "links": [
+  {
+   "hls": "016651",
+   "name": "Jakob Bickhart",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "016658",
+   "name": "David von Büren",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "016673",
+   "name": "Albrecht von Erlach",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "023651",
+   "name": "Johann Rudolf von Erlach",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "015781",
+   "name": "David Fellenberg",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "016694",
+   "name": "Beat Fischer",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "028607",
+   "name": "Beat Fischer",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "016697",
+   "name": "Samuel Fischer",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "016702",
+   "name": "Johann Frischherz",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "025161",
+   "name": "Uli Galli",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "016715",
+   "name": "Abraham von Graffenried",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "016720",
+   "name": "Emanuel von Graffenried",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "016728",
+   "name": "Franz Güder",
+   "ssrq": null,
+   "kf": null,
+   "name_only": [
+    {
+     "source": "kf",
+     "id": "per029508",
+     "name": "Franz Güder",
+     "note": "birth and death are null, no HLS/GND id; only mention (entry U-17_0966a) reads 'Franntz Güdter, ✳ ober vogt der herschafft Schenckhenbe rg'"
+    }
+   ]
+  },
+  {
+   "hls": "010666",
+   "name": "Niklaus Henzi",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "016743",
+   "name": "Samuel Jenner",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "016739",
+   "name": "Daniel Imhof",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "016741",
+   "name": "Johann Georg Imhof",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "017095",
+   "name": "Adrian Knecht",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "017099",
+   "name": "Samuel Lerber",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "018844",
+   "name": "Niklaus Leuenberger",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "017104",
+   "name": "Niklaus Manuel (II.)",
+   "ssrq": {
+    "id": "per024920",
+    "name": "Niklaus Manuel",
+    "dates": "first_year 1528, last_year 1588, years [1528, 1588]",
+    "basis": "dates"
+   },
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "017119",
+   "name": "Georg von Muralt",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "016686",
+   "name": "Hans Franz Nägeli",
+   "ssrq": {
+    "id": "per009173",
+    "name": "Hans Franz Nägeli",
+    "dates": "first_year 1497, last_year 1579, years [1497, 1529, 1579]",
+    "basis": "dates"
+   },
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "019148",
+   "name": "Joseph Plepp",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "012323",
+   "name": "Anton Stettler",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "012324",
+   "name": "Michael Stettler",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "017255",
+   "name": "Beat Ludwig Stürler",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "017266",
+   "name": "Johann Anton Tillier",
+   "ssrq": null,
+   "kf": null,
+   "name_only": [
+    {
+     "source": "ssrq",
+     "id": "per009340",
+     "name": "Johann Anton Tillier",
+     "note": "record years [1546, 1562] fall inside the lifetime 1528-1598 but neither is within 2 years of birth or death; no HLS/GND id in the record"
+    }
+   ]
+  },
+  {
+   "hls": "017270",
+   "name": "Johann Rudolf Tillier",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "017262",
+   "name": "Jakob Thormann",
+   "ssrq": null,
+   "kf": null,
+   "name_only": [
+    {
+     "source": "ssrq",
+     "id": "per009107",
+     "name": "Jakob Thormann",
+     "note": "record years [1594, 1632] fall inside the lifetime 1567-1639 but neither is within 2 years of birth or death; no HLS/GND id in the record"
+    }
+   ]
+  },
+  {
+   "hls": "010905",
+   "name": "Johannes Wäber",
+   "ssrq": null,
+   "kf": null,
+   "name_only": [
+    {
+     "source": "ssrq",
+     "id": "per029253",
+     "name": "Hans Weber",
+     "note": "record years [1537]; Hans Weber is a very common name, record has no life dates and no HLS/GND id"
+    },
+    {
+     "source": "ssrq",
+     "id": "per025197",
+     "name": "Hans Weber",
+     "note": "record years [1538]; Hans Weber is a very common name, record has no life dates and no HLS/GND id"
+    },
+    {
+     "source": "ssrq",
+     "id": "per025217",
+     "name": "Hans Weber",
+     "note": "record years [1545], orig_names [\"Küderli\"]; Hans Weber is a very common name, record has no life dates and no HLS/GND id"
+    },
+    {
+     "source": "ssrq",
+     "id": "per025687",
+     "name": "Hans Weber",
+     "note": "record years [1544, 1558]; Hans Weber is a very common name, record has no life dates and no HLS/GND id"
+    },
+    {
+     "source": "ssrq",
+     "id": "per013922",
+     "name": "Hans Weber",
+     "note": "record years [1552]; Hans Weber is a very common name, record has no life dates and no HLS/GND id"
+    },
+    {
+     "source": "kf",
+     "id": "per029253",
+     "name": "Hans Weber",
+     "note": "birth and death are null; mention 'Hans Waͤber' in entry U-17_0948 (same id as the SSRQ record with year 1537); Hans Weber is a very common name, record has no life dates and no HLS/GND id"
+    }
+   ]
+  },
+  {
+   "hls": "017292",
+   "name": "Johann von Wattenwyl",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "017296",
+   "name": "Ludwig von Wattenwyl",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "017297",
+   "name": "Petermann von Wattenwyl",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "017310",
+   "name": "Kaspar Willading",
+   "ssrq": {
+    "id": "per009537",
+    "name": "Kaspar Willading",
+    "dates": "first_year 1531, last_year 1570, years [1531, 1566, 1570]",
+    "basis": "dates"
+   },
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "024416",
+   "name": "Gabriel von Weiss",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "017298",
+   "name": "Abraham von Werdt",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  },
+  {
+   "hls": "017300",
+   "name": "Peter von Werdt",
+   "ssrq": null,
+   "kf": null,
+   "name_only": []
+  }
+ ]
+}

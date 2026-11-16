@@ -471,3 +471,19 @@ details.tableview summary { cursor: pointer; color: var(--muted); }
 /* ---------- Karte ---------- */
 .tbmap { height: min(68vh, 640px); min-height: 380px; border: 1px solid var(--line); border-radius: 10px; margin: 8px 0; background: #f1eee8; z-index: 0; }
 .tbmap .leaflet-tooltip { font: inherit; font-size: .85rem; }
+
+/* ---------- Register ---------- */
+.regtabs { display: flex; gap: 6px; margin: 8px 0 10px; }
+.regtabs a { padding: 4px 12px; border-radius: 999px; background: var(--chip); color: inherit; text-decoration: none; font-size: .9rem; }
+.regtabs a.on { background: var(--chip-on); color: var(--chip-on-ink); font-weight: 600; }
+.anbar input[type=search] { min-width: 16em; padding: 4px 8px; border: 1px solid var(--line); border-radius: 6px; font: inherit; }
+details.regrow { border-top: 1px solid var(--line); padding: 4px 0; }
+details.regrow > summary { cursor: pointer; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; padding: 3px 0; }
+details.regrow .rn { font-weight: 600; }
+.regbody { padding: 2px 0 8px 18px; }
+.regbody ul { margin: 6px 0; padding-left: 18px; font-size: .9rem; columns: 2 320px; }
+.regbody p { margin: 3px 0; }
+.props { margin: 6px 0; }
+.prop { border-left: 3px solid var(--line); padding: 2px 8px; margin: 4px 0; display: flex; flex-wrap: wrap; gap: 2px 8px; align-items: baseline; }
+.prop.likely { border-left-color: var(--brand); }
+.an-card h2 .sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; }

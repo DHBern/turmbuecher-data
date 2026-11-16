@@ -28,6 +28,13 @@ Viewer: <https://dhbern.github.io/turmbuecher-data/> (abgeleitet aus dem der
   (`scripts/places.py`, `register/orte.json`), das sind 43 % der Ortsnennungen; verknüpft wird nur,
   wo der ganze Name auf genau einen Schweizer Ort passt. Ältere Namen stehen in
   `taxonomy/ortsnamen.json` und lassen sich dort ergänzen.
+- **Register:** Personen, Orte, Delikte (`site/register.js`, `scripts/register.py`). Das
+  Personenregister fasst die Nennungen zu 18 086 Namensformen zusammen (keine identifizierten
+  Personen). 80 davon tragen Vorschläge aus dem Historischen Lexikon der Schweiz, 38 als
+  «wahrscheinlich» (einzige Person des Namens, Vornamen stimmen, zur Zeit am Leben, Bezug zu Bern);
+  drei davon sind über Lebensdaten in der Personendatei der Sammlung Schweizerischer Rechtsquellen
+  bestätigt. 341 Gemeinden sind über ihre BFS-Nummer mit Wikidata, HLS, GND und GeoNames verbunden.
+  Die Normdatentabellen liegen in `register/normdaten/`.
 - **Auswertung:** Sankey Zeitraum → Delikt → zusammen genannte Delikte bzw. Ausgang, Delikte über
   die Zeit, Häufigkeit der Delikte (`site/analysis.js`).
 - **Lesungen:** der Text aus Transkribus (`transkribus-bestand`); ausser auf den Ground-Truth-Seiten

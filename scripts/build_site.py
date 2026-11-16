@@ -264,7 +264,7 @@ def write_analysis() -> None:
             known.append(d["gruppe"])
             groups.append({"id": d["gruppe"], "farbe": "#898781"})
     out = {"version": tax.get("version", 1), "groups": groups,
-           "offences": [{"id": d["id"], "label": d["label"], "group": d["gruppe"]} for d in tax["delikte"]],
+           "offences": [{"id": d["id"], "label": d["label"], "group": d["gruppe"], "hint": d.get("hinweis", "")} for d in tax["delikte"]],
            "sanctions": [{"id": d["id"], "label": d["label"]} for d in tax["sanktionen"]],
            "volumes": vols, "entries": rows,
            "model": sorted({json.loads(x)["model"] for x in path.read_text(encoding="utf-8").splitlines() if json.loads(x).get("model")})}
@@ -376,6 +376,9 @@ def main() -> None:
         v["text"] += int(p.get("text_lines") or 0) > 0
     write_analysis()
     reg = ROOT / "register" / "orte.json"
+    pers = ROOT / "register" / "personen.json"
+    if pers.exists():       # the register of persons (scripts/register.py)
+        shutil.copyfile(pers, OUT / "register_personen.json")
     if reg.exists():        # the map's places (scripts/places.py); the viewer joins them to analysis.json by entry id
         shutil.copyfile(reg, OUT / "map.json")
     out = {"chunk": CHUNK, "analysis": (OUT / "analysis.json").exists(), "map": (OUT / "map.json").exists(), "pages": len(pages),
