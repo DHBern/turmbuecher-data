@@ -20,9 +20,12 @@ Viewer: <https://dhbern.github.io/turmbuecher-data/> (abgeleitet aus dem der
   offenes Modell Qwen3.8-27B auf dem GPUStack der Universität Bern, Vokabular in
   `taxonomy/delikte.json`, erweiterbar nach `taxonomy/README.md`). Alles ungeprüfte
   Maschinenentwürfe. Sieben Bände (B IX 498–500, 502–505) haben in Transkribus noch keinen Text.
-- **Jahre** gelten nur innerhalb der Spanne ihres Bandes (bekannt aus `taxonomy/bandjahre.json`
-  oder dem Titel, sonst aus den gelesenen Jahren und den Nachbarbänden erschlossen); ein Jahr, das
-  genau 50 oder 100 Jahre daneben liegt, wird berichtigt, ein anderes verworfen.
+- **Jahre** gelten nur innerhalb der Laufzeit ihres Bandes: für B IX 422–492 laut Archivkatalog des
+  Staatsarchivs (`taxonomy/bandjahre.json`), sonst laut Titel oder aus den gelesenen Jahren und den
+  Nachbarbänden erschlossen. Ein Jahr, das genau 50 oder 100 Jahre daneben liegt oder sich in der
+  Zehnerziffer unterscheidet (nur wenn genau ein Jahr passt), wird berichtigt, ein anderes verworfen.
+  Wo gelesenes Jahr und Laufzeit nicht übereinstimmen, trägt der Eintrag einen Vermerk (im Viewer
+  und im TEI); `entries/datierung_vermerke.md` listet sie, Band für Band und Eintrag für Eintrag.
 - **Karte:** Herkunft der Beschuldigten und genannte Orte, mit Filter nach Zeitraum und Delikt
   (`site/map.js`, Kartengrund swisstopo). 529 Orte sind über die Ortssuche von swisstopo verknüpft
   (`scripts/places.py`, `register/orte.json`), das sind 43 % der Ortsnennungen; verknüpft wird nur,

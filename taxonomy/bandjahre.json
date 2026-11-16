@@ -1,4 +1,363 @@
 {
- "_": "Bekannte Laufzeiten einzelner Bände. Ein Eintrag hier geht den aus den gelesenen Jahren erschlossenen Spannen vor (scripts/entries.py, volume_years). Ergänzen, wo der Archivkatalog die Laufzeit nennt: Bandname wie in readings/pages.tsv (Spalte volume).",
- "Henzi": {"von": 1749, "bis": 1749, "quelle": "Verhöre zur Henzi-Verschwörung, Sommer 1749; das Modell liest die Jahrzehntziffer uneinheitlich (1649, 1669, 1719 …)"}
+ "_": "Bekannte Laufzeiten der Bände. Ein Eintrag hier geht den aus den gelesenen Jahren erschlossenen Spannen vor (scripts/entries.py, volume_years). B IX 422–492: Online-Archivkatalog des Staatsarchivs des Kantons Bern, Serie «Turmbücher (1545–1747)», abgeschrieben am 16.11.2026. Bandname wie in readings/pages.tsv (Spalte volume).",
+ "Henzi": {
+  "von": 1749,
+  "bis": 1749,
+  "quelle": "Verhöre zur Henzi-Verschwörung, Sommer 1749; das Modell liest die Jahrzehntziffer uneinheitlich (1649, 1669, 1719 …)"
+ },
+ "B IX 422": {
+  "von": 1545,
+  "bis": 1555,
+  "quelle": "StABE-Katalog (Band 1545 - 1546 und 1552 - 1555)"
+ },
+ "B IX 423": {
+  "von": 1551,
+  "bis": 1552,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 424": {
+  "von": 1555,
+  "bis": 1559,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 425": {
+  "von": 1560,
+  "bis": 1561,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 426": {
+  "von": 1561,
+  "bis": 1562,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 427": {
+  "von": 1563,
+  "bis": 1563,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 428": {
+  "von": 1564,
+  "bis": 1566,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 429": {
+  "von": 1566,
+  "bis": 1567,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 430": {
+  "von": 1567,
+  "bis": 1568,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 431": {
+  "von": 1568,
+  "bis": 1569,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 432": {
+  "von": 1569,
+  "bis": 1570,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 433": {
+  "von": 1570,
+  "bis": 1570,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 434": {
+  "von": 1571,
+  "bis": 1572,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 435": {
+  "von": 1573,
+  "bis": 1574,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 436": {
+  "von": 1574,
+  "bis": 1575,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 437": {
+  "von": 1575,
+  "bis": 1575,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 438": {
+  "von": 1575,
+  "bis": 1576,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 439": {
+  "von": 1576,
+  "bis": 1577,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 440": {
+  "von": 1577,
+  "bis": 1577,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 441": {
+  "von": 1576,
+  "bis": 1580,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 442": {
+  "von": 1577,
+  "bis": 1580,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 443": {
+  "von": 1580,
+  "bis": 1581,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 444": {
+  "von": 1582,
+  "bis": 1583,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 445": {
+  "von": 1583,
+  "bis": 1583,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 446": {
+  "von": 1584,
+  "bis": 1585,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 447": {
+  "von": 1585,
+  "bis": 1585,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 448": {
+  "von": 1585,
+  "bis": 1586,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 449": {
+  "von": 1586,
+  "bis": 1587,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 450": {
+  "von": 1587,
+  "bis": 1587,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 451": {
+  "von": 1587,
+  "bis": 1589,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 452": {
+  "von": 1589,
+  "bis": 1592,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 453": {
+  "von": 1592,
+  "bis": 1595,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 454": {
+  "von": 1596,
+  "bis": 1599,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 455": {
+  "von": 1600,
+  "bis": 1601,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 456": {
+  "von": 1601,
+  "bis": 1602,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 457": {
+  "von": 1605,
+  "bis": 1607,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 458": {
+  "von": 1608,
+  "bis": 1611,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 459": {
+  "von": 1611,
+  "bis": 1612,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 460": {
+  "von": 1613,
+  "bis": 1617,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 461": {
+  "von": 1617,
+  "bis": 1622,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 462": {
+  "von": 1622,
+  "bis": 1624,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 463": {
+  "von": 1624,
+  "bis": 1627,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 464": {
+  "von": 1627,
+  "bis": 1629,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 465": {
+  "von": 1629,
+  "bis": 1630,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 466": {
+  "von": 1631,
+  "bis": 1632,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 467": {
+  "von": 1635,
+  "bis": 1638,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 468": {
+  "von": 1638,
+  "bis": 1641,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 469": {
+  "von": 1641,
+  "bis": 1644,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 470": {
+  "von": 1644,
+  "bis": 1647,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 471": {
+  "von": 1647,
+  "bis": 1648,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 472": {
+  "von": 1648,
+  "bis": 1650,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 473": {
+  "von": 1650,
+  "bis": 1653,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 474": {
+  "von": 1650,
+  "bis": 1653,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 475": {
+  "von": 1653,
+  "bis": 1653,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 476": {
+  "von": 1653,
+  "bis": 1656,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 477": {
+  "von": 1657,
+  "bis": 1660,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 478": {
+  "von": 1660,
+  "bis": 1663,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 479": {
+  "von": 1664,
+  "bis": 1665,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 480": {
+  "von": 1666,
+  "bis": 1669,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 481": {
+  "von": 1669,
+  "bis": 1672,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 482": {
+  "von": 1672,
+  "bis": 1675,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 483": {
+  "von": 1675,
+  "bis": 1678,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 484": {
+  "von": 1681,
+  "bis": 1684,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 485": {
+  "von": 1684,
+  "bis": 1690,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 486": {
+  "von": 1704,
+  "bis": 1711,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 487": {
+  "von": 1711,
+  "bis": 1721,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 488": {
+  "von": 1721,
+  "bis": 1722,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 489": {
+  "von": 1722,
+  "bis": 1726,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 490": {
+  "von": 1727,
+  "bis": 1729,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 491": {
+  "von": 1730,
+  "bis": 1737,
+  "quelle": "StABE-Katalog"
+ },
+ "B IX 492": {
+  "von": 1739,
+  "bis": 1747,
+  "quelle": "StABE-Katalog"
+ }
 }

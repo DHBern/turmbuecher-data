@@ -172,6 +172,7 @@ def load_drafts(letter_ids: set[str]) -> dict[str, dict]:
             "date_text": d.get("date_text") or "",
             "year": year if isinstance(year, int) else None,
             "year_source": d.get("year_source") or "",
+            "year_note": d.get("year_note") or "",
             "regest": d["regest"].strip(),
         }
     return out

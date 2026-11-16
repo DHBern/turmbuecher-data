@@ -265,5 +265,6 @@
   "pr.p.q": "Ist die Person in diesen Einträgen die Person im Lexikon?",
   "pr.p.same": "dieselbe Person",
   "pr.p.other": "eine andere Person",
-  "pr.p.missing": "Bitte eine Antwort wählen."
+  "pr.p.missing": "Bitte eine Antwort wählen.",
+  "draft.yearnote": "Vermerk:"
 }

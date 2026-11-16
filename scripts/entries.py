@@ -41,6 +41,7 @@ came from.
 from __future__ import annotations
 
 import argparse
+import collections
 import csv
 import json
 import re
@@ -335,9 +336,13 @@ def volume_years(by_vol: dict[str, list[dict]], docs: dict[str, str]) -> list[st
       one in its title, where there is one; else the
       densest cluster of the years read in the volume, and of several clusters
       the one that fits between the neighbouring volumes;
-    * a year outside the span that falls inside it when moved by 50 or 100 is
+    * a year outside the span that falls inside it when moved by 50 or 100, or
+      by changing its tens digit (only when exactly one such year fits), is
       corrected (``berichtigt``); any other year outside is dropped, and the
-      entry takes the year of the entry before it (``vom vorangehenden Eintrag``).
+      entry takes the year of the entry before it (``vom vorangehenden Eintrag``);
+    * every entry whose year read disagrees with the span gets a note
+      (``year_note``), and ``entries/datierung_vermerke.md`` lists them, with
+      the volumes whose years read mostly fall outside their known span.
     """
     order = sorted((v for v in by_vol if re.match(r"^B IX \d+", v)), key=vol_number)
     years = {v: [y for e in by_vol[v] if e["x"] and (y := year_of(e["x"]["datum"]))] for v in by_vol}
@@ -396,25 +401,74 @@ def volume_years(by_vol: dict[str, list[dict]], docs: dict[str, str]) -> list[st
                 if len(earlier) >= few:
                     span = (min(earlier), span[1])
         last, moved, dropped = None, 0, 0
+        whose = known[v].get("quelle", "Katalog") if isinstance(known.get(v), dict) else ("Titel des Bandes" if fixed[v] else "erschlossene Spanne")
         for e in es:
             if not e["x"]:
                 continue
+            e["year_note"] = ""
             y, source = year_of(e["x"]["datum"]), "genannt"
+            read = y
             if y and span and not (span[0] - 1 <= y <= span[1] + 1):
                 alt = next((y + d for d in SLIPS if span[0] <= y + d <= span[1]), None)
+                if alt is None:     # one misread tens digit (1618 for 1658), only if exactly one fits
+                    tens = [y - (y // 10 % 10) * 10 + k * 10 for k in range(10)]
+                    tens = [x for x in tens if x != y and span[0] <= x <= span[1]]
+                    alt = tens[0] if len(tens) == 1 else None
+                    kind = "Zehnerziffer"
+                else:
+                    kind = "50/100 Jahre"
                 if alt:
                     y, source, moved = alt, "berichtigt (gelesen als %d)" % y, moved + 1
                 else:
                     y, dropped = None, dropped + 1
+                # a note wherever the year read and the volume's span disagree (Tobias, 16.11.2026)
+                e["year_note"] = (f"Datierung stimmt nicht mit der Laufzeit des Bandes überein: im Text gelesen "
+                                  f"«{e['x']['datum_text'] or read}» ({read}), Laufzeit {span[0]}–{span[1]} ({whose}). "
+                                  + (f"Jahr berichtigt zu {alt} ({kind})." if alt else "Jahr verworfen, das des vorangehenden Eintrags übernommen."))
             if y and (span or len(years[v]) < 5):
                 e["year"], e["year_source"], last = y, source, y
             elif last:
                 e["year"], e["year_source"] = last, "vom vorangehenden Eintrag"
             else:
                 e["year"], e["year_source"] = None, ""
+        inside = [y for y in years[v] if span and span[0] - 1 <= y <= span[1] + 1]
+        e0 = es[0]
+        e0.setdefault("_vol", {})
+        e0["_vol"] = {"span": span, "src": src, "whose": whose, "read": len(years[v]), "inside": len(inside),
+                      "moved": moved, "dropped": dropped,
+                      "outside": collections.Counter(y for y in years[v] if span and not (span[0] - 1 <= y <= span[1] + 1)).most_common(6)}
         report.append(f"  {v}: {len(es)} entries, {sum(1 for e in es if e['x'])} described, span {span} "
-                      f"({src if span else '—'}), {moved} years corrected by 50/100, {dropped} dropped")
+                      f"({src if span else '—'}), {moved} years corrected, {dropped} dropped")
     return report
+
+
+def write_notes(by_vol: dict[str, list[dict]]) -> None:
+    """entries/datierung_vermerke.md: where the years read and the volumes'
+    spans disagree, volume by volume and entry by entry."""
+    order = sorted(by_vol, key=lambda v: (vol_number(v), v))
+    out = ["# Vermerke zur Datierung", "",
+           "Wo ein im Eintrag gelesenes Jahr nicht in die Laufzeit des Bandes passt (Laufzeit laut Archivkatalog "
+           "des Staatsarchivs, laut Titel oder aus den gelesenen Jahren erschlossen). Erzeugt von scripts/entries.py.", "",
+           "## Bände", "", "| Band | Laufzeit | Quelle | Jahre gelesen | davon in der Laufzeit | berichtigt | verworfen | häufigste Jahre ausserhalb |",
+           "|---|---|---|---|---|---|---|---|"]
+    entries_out = []
+    for v in order:
+        es = by_vol[v]
+        info = es[0].get("_vol") or {}
+        if not info or not info.get("span"):
+            continue
+        share = info["inside"] / info["read"] if info["read"] else 1
+        flag = " ⚠" if info["read"] >= 5 and share < 0.8 else ""
+        out.append(f"| {v}{flag} | {info['span'][0]}–{info['span'][1]} | {info['whose']} | {info['read']} | "
+                   f"{info['inside']} ({share:.0%}) | {info['moved']} | {info['dropped']} | "
+                   + ", ".join(f"{y} ×{n}" for y, n in info["outside"]) + " |")
+        for e in es:
+            if e.get("year_note"):
+                entries_out.append(f"- [{e['id']}](https://dhbern.github.io/turmbuecher-data/#/e/{e['id']}/1): {e['year_note']}")
+    out += ["", "⚠: weniger als 80 % der gelesenen Jahre liegen in der Laufzeit. Das kann an den Lesungen liegen, an "
+            "Einträgen, die frühere Vorgänge erzählen, oder an einer Laufzeit, die nicht zum Band passt.", "",
+            f"## Einträge ({len(entries_out)})", ""] + entries_out
+    (ENT / "datierung_vermerke.md").write_text("\n".join(out) + "\n", encoding="utf-8")
 
 
 def build(args) -> None:
@@ -436,6 +490,7 @@ def build(args) -> None:
         by_vol.setdefault(e["volume"], []).append(e)
 
     report = volume_years(by_vol, docs)
+    write_notes(by_vol)
 
     ENT.mkdir(exist_ok=True)
     (ROOT / "regests").mkdir(exist_ok=True)
@@ -446,12 +501,14 @@ def build(args) -> None:
         title = make_title(x) if x and x["art"] != "register" else ""
         rec.append({"id": e["id"], "volume": e["volume"], "nr": e["nr"], "kind": (x or {}).get("art") or e["kind"],
                     "spans": e["spans"], "year": e.get("year"), "year_source": e.get("year_source", ""),
-                    "title": title, "reader": args.reader, "model": e["model"], "tax": e.get("tax"), **(x or {})})
+                    "title": title, "reader": args.reader, "model": e["model"], "tax": e.get("tax"),
+                    "year_note": e.get("year_note", ""), **(x or {})})
         units.append({"id": e["id"], "shelf": e["volume"], "nr": e["nr"], "title": "", "pages": ";".join(keys),
                       "spans": json.dumps(e["spans"], separators=(",", ":"))})
         if x and x["regest"]:
             drafts.append({"id": e["id"], "heading": title, "reader": args.reader, "model": e["model"],
                            "draft": {"regest": x["regest"], "year": e.get("year"), "year_source": e.get("year_source", ""),
+                                     "year_note": e.get("year_note", ""),
                                      "date_text": x["datum_text"],
                                      "persons": x["personen"], "offences": x["delikte"], "place": ""}})
     for path, rows in ((ENT / "entries.jsonl", rec), (ROOT / "regests" / "drafts.jsonl", drafts)):

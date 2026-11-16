@@ -569,6 +569,7 @@
       <summary>${esc(t("draft.summary"))}</summary>
       ${d.heading ? `<div class="meta"><span class="parties">${esc(d.heading)}</span></div>` : ""}
       ${when || d.year ? `<p class="small muted">${when}${d.year ? `${when ? " · " : ""}${esc(t("draft.year", { year: d.year, source: d.year_source || t("draft.year.read") }))}` : ""}</p>` : ""}
+      ${d.year_note ? `<p class="caveat small">${esc(t("draft.yearnote"))} ${esc(d.year_note)}</p>` : ""}
       <p lang="de">${esc(d.regest)}</p>
       <p class="small muted">${esc(t("draft.note", { model: d.model || t("draft.amodel"), reader: readerLabel(d.reader) }))}</p>
     </details>`;

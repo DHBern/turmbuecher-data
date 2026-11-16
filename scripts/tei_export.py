@@ -209,6 +209,8 @@ def main() -> None:
                 cert = "medium" if src == "genannt" else "low"
                 d.append(f'<note type="datierung" resp="#erschliessung"><date{a(when=e.get("year"), cert=cert)}>{escape(e.get("datum_text") or str(e.get("year")))}</date>'
                          f'{" (Jahr: " + escape(src) + ")" if src else ""}</note>')
+            if e.get("year_note"):
+                d.append(f'<note type="vermerk" subtype="datierung" resp="#erschliessung">{escape(e["year_note"])}</note>')
             if e.get("regest"):
                 d.append(f'<note type="regest" resp="#erschliessung" xml:lang="de">{escape(e["regest"])}</note>')
             if e.get("delikt_woertlich"):
