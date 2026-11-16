@@ -1,0 +1,24 @@
+{
+ "_": "Verantwortliche, wie sie im TEI-Kopf und auf der Seite «Über» stehen. Herausgebende: das Berner Turmbücher-Team; Mitarbeitende: das übrige Team des Projekts «The Flow» (flow-project.net, Stand 15.11.2026). ORCID, wo die Flow-Seite eine nennt.",
+ "herausgebende": [
+  {"name": "Tobias Hodel", "orcid": "0000-0002-2071-6407", "ort": "Universität Bern"},
+  {"name": "Dominic Weber", "orcid": "0000-0002-9265-3388", "ort": "Universität Bern"},
+  {"name": "Jonas Widmer", "orcid": "0000-0001-9690-5645", "ort": "Universität Bern"},
+  {"name": "Anna Funk", "ort": "Universität Bern"},
+  {"name": "Myrjam Hostettler", "ort": "Universität Bern"}
+ ],
+ "mitarbeitende": [
+  {"name": "Angela Huang", "orcid": "0000-0002-5321-9888", "ort": "Forschungsstelle für die Geschichte der Hanse und des Ostseeraums, Europäisches Hansemuseum Lübeck"},
+  {"name": "Silke Schwandt", "orcid": "0000-0001-8303-4668", "ort": "Universität Bielefeld"},
+  {"name": "Serena Tolino", "orcid": "0000-0001-7740-5805", "ort": "Universität Bern"},
+  {"name": "Sefer Korkmaz", "orcid": "0000-0001-9718-179X", "ort": "Universität Bern"},
+  {"name": "Christopher Kuhlmann", "orcid": "0009-0006-9455-6203", "ort": "Universität Bielefeld"},
+  {"name": "Inga Lange", "orcid": "0009-0005-4009-8844", "ort": "Forschungsstelle für die Geschichte der Hanse und des Ostseeraums, Europäisches Hansemuseum Lübeck"},
+  {"name": "Dana Meyer", "ort": "Universität Bielefeld"},
+  {"name": "Bart Holterman", "orcid": "0000-0002-6414-4092", "ort": "Forschungsstelle für die Geschichte der Hanse und des Ostseeraums, Europäisches Hansemuseum Lübeck"},
+  {"name": "Mohamed Ilyes Mechentel", "ort": "Universität Bern"},
+  {"name": "Melvin Wilde", "orcid": "0009-0006-8774-8901", "ort": "Universität Bielefeld"},
+  {"name": "Judith Neubauer", "ort": "Forschungsstelle für die Geschichte der Hanse und des Ostseeraums, Europäisches Hansemuseum Lübeck"},
+  {"name": "Vivien Popken", "orcid": "0009-0003-0540-4522", "ort": "Forschungsstelle für die Geschichte der Hanse und des Ostseeraums, Europäisches Hansemuseum Lübeck"}
+ ]
+}

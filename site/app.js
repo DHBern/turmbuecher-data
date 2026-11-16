@@ -473,6 +473,7 @@
           <h1>${esc((unit.draft && unit.draft.heading) || unit.title || titleOf(unit))}</h1>
           ${unit.draft && unit.draft.heading ? `<div class="muted small">${esc(titleOf(unit))} ${draftMark()}</div>` : ""}
           ${draftBlock(unit.draft)}
+          ${unit.p ? "" : `<p class="small teilinks">TEI: <button type="button" class="linkish" id="tei-entry">${esc(t("tei.entry"))}</button> · <a href="data/tei/${encodeURIComponent(teiFile(unit.shelf))}" download>${esc(t("tei.volume", { vol: unit.shelf }))}</a> <span id="tei-msg" class="muted"></span></p>`}
           <div class="pages">${pages.length > 1 ? `<span class="lbl">${esc(t("unit.pages"))}</span>${pages.map(pgBtn).join("")}` : ""}
             ${state.cfg.images ? `<button type="button" class="linkish imgtoggle" id="imgtoggle" aria-pressed="${showImg}">${esc(t(showImg ? "img.hide" : "img.show"))}</button>` : ""}
           </div>
@@ -501,6 +502,8 @@
       if (b.disabled) return;
       location.hash = `${href(id, pageNo)}/${encodeURIComponent(b.dataset.reader)}`;
     }));
+    const teiBtn = document.getElementById("tei-entry");
+    teiBtn && teiBtn.addEventListener("click", () => downloadEntryTei(unit));
     const tog = document.getElementById("imgtoggle");
     tog && tog.addEventListener("click", () => { store.set("image", !showImg); destroyOsd(); route(); });
     const m = document.getElementById("t-mode");
@@ -515,6 +518,47 @@
     rd.addEventListener("click", onLineClick);
     clearRows();
   }
+
+  /* TEI: one file per volume (data/tei/<volume>.xml, scripts/tei_export.py). An
+     entry's own TEI is cut from it here: the header, the surfaces of the entry's
+     pages and its <div>, as a document of its own. */
+  const teiFile = (vol) => vol.replace(/[^A-Za-z0-9]+/g, "_") + ".xml";
+  const teiDocs = new Map();
+  async function downloadEntryTei(unit) {
+    const msg = document.getElementById("tei-msg");
+    const say = (s) => { if (msg) msg.textContent = s; };
+    try {
+      say(t("tei.loading"));
+      const file = teiFile(unit.shelf);
+      if (!teiDocs.has(file)) teiDocs.set(file, fetch("data/tei/" + file).then((r) => { if (!r.ok) throw new Error(r.status); return r.text(); })
+        .then((x) => new DOMParser().parseFromString(x, "application/xml")));
+      const doc = await teiDocs.get(file);
+      const NS = "http://www.tei-c.org/ns/1.0", XML = "http://www.w3.org/XML/1998/namespace";
+      const byId = (id) => [...doc.getElementsByTagNameNS(NS, "*")].find((el) => el.getAttributeNS(XML, "id") === id);
+      const div = byId(unit.id);
+      if (!div) throw new Error(unit.id);
+      const out = document.implementation.createDocument(NS, "TEI", null);
+      out.documentElement.setAttributeNS(XML, "xml:id", unit.id + "_tei");
+      out.documentElement.appendChild(out.importNode(doc.getElementsByTagNameNS(NS, "teiHeader")[0], true));
+      const fac = out.createElementNS(NS, "facsimile");
+      const pages = new Set([...div.getElementsByTagNameNS(NS, "pb")].map((pb) => (pb.getAttribute("facs") || "").slice(1)));
+      for (const s of doc.getElementsByTagNameNS(NS, "surface")) if (pages.has(s.getAttributeNS(XML, "id"))) fac.appendChild(out.importNode(s, true));
+      out.documentElement.appendChild(fac);
+      const text = out.createElementNS(NS, "text"), body = out.createElementNS(NS, "body");
+      body.appendChild(out.importNode(div, true));
+      text.appendChild(body);
+      out.documentElement.appendChild(text);
+      const xml = '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(out);
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([xml], { type: "application/tei+xml" }));
+      a.download = unit.id + ".xml";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+      say("");
+      return xml;
+    } catch (e) { say(t("tei.failed")); return null; }
+  }
+  window.TBTei = { entry: downloadEntryTei };
 
   /* A heading and regest drafted by a language model: always marked as such. */
   function draftBlock(d) {

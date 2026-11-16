@@ -35,6 +35,10 @@ Viewer: <https://dhbern.github.io/turmbuecher-data/> (abgeleitet aus dem der
   drei davon sind über Lebensdaten in der Personendatei der Sammlung Schweizerischer Rechtsquellen
   bestätigt. 341 Gemeinden sind über ihre BFS-Nummer mit Wikidata, HLS, GND und GeoNames verbunden.
   Die Normdatentabellen liegen in `register/normdaten/`.
+- **TEI:** eine Datei pro Band (`scripts/tei_export.py`, beim Bau nach `site/data/tei/`), gültig
+  gegen TEI-All: Einträge mit Text, Zeilenverweisen ins Bild, den Auszeichnungen aus Transkribus
+  und der maschinellen Erschliessung (`@resp`, `@cert`); Herausgebende und Mitarbeitende aus
+  `taxonomy/verantwortliche.json`. Der Viewer bietet den Download je Band und je Eintrag.
 - **Auswertung:** Sankey Zeitraum → Delikt → zusammen genannte Delikte bzw. Ausgang, Delikte über
   die Zeit, Häufigkeit der Delikte (`site/analysis.js`).
 - **Lesungen:** der Text aus Transkribus (`transkribus-bestand`); ausser auf den Ground-Truth-Seiten

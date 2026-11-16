@@ -375,6 +375,9 @@ def main() -> None:
         v["gt"] += p.get("status") in ("GT", "DONE", "FINAL")
         v["text"] += int(p.get("text_lines") or 0) > 0
     write_analysis()
+    if (ROOT / "entries" / "entries.jsonl").exists():      # TEI, one file per volume (scripts/tei_export.py)
+        import subprocess
+        subprocess.run([sys.executable, str(ROOT / "scripts" / "tei_export.py"), "--out", str(OUT / "tei")], check=True)
     reg = ROOT / "register" / "orte.json"
     pers = ROOT / "register" / "personen.json"
     if pers.exists():       # the register of persons (scripts/register.py)
