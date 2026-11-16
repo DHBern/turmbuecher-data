@@ -379,6 +379,9 @@ def main() -> None:
         import subprocess
         subprocess.run([sys.executable, str(ROOT / "scripts" / "tei_export.py"), "--out", str(OUT / "tei")], check=True)
     reg = ROOT / "register" / "orte.json"
+    check = ROOT / "pruefung" / "stichprobe.json"
+    if check.exists():      # the sample for checking by hand (scripts/pruefung.py)
+        shutil.copyfile(check, OUT / "pruefung.json")
     pers = ROOT / "register" / "personen.json"
     if pers.exists():       # the register of persons (scripts/register.py)
         shutil.copyfile(pers, OUT / "register_personen.json")

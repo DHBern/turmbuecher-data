@@ -98,6 +98,7 @@
     if (parts[0] === "page" && parts[1]) return toPageKey(parts[1], parts[2]);
     if (parts[0] === "readers") return showReaders();
     if (parts[0] === "about") return showAbout();
+    if (parts[0] === "pruefen") { setNav("about"); return window.TBCheck.show(app, { t, esc, num, json, store }, parts[1], parts[2]); }
     if (parts[0] === "register") { setNav("register"); return window.TBRegister.show(app, { t, esc, num, json, store }, parts[1]); }
     if (parts[0] === "karte") { setNav("map"); return window.TBMap.show(app, { t, esc, num, json, store }); }
     if (parts[0] === "auswertung") { setNav("analysis"); return window.TBAnalysis.show(app, { t, esc, num, json, store }); }
