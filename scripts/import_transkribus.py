@@ -170,7 +170,7 @@ def read_page(path: Path) -> tuple[list[dict], tuple[int, int]]:
         rtype = (m.group(1).strip() if m else "") or (region.get("type") or "")
         tls = [tl for tl in region if local(tl) == "TextLine"]
         for _, tl in sorted(enumerate(tls), key=lambda p: ro_index(p[1], p[0])):
-            lines.append({"text": line_text(tl), "coords": points(tl), "region": rtype,
+            lines.append({"id": tl.get("id"), "text": line_text(tl), "coords": points(tl), "region": rtype,
                           "tags": tags(tl.get("custom") or "")})
     return lines, size
 

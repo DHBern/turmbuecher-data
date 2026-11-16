@@ -39,7 +39,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 BACKBONE = "transkribus-bestand"
-DEFAULT_READERS = ["qwen3.5-4b-german-kurrent-xvi-xix-page-v1", "trocr-kurrent-xvi-xvii"]
+# the first reader a page has is its backbone where Transkribus has no text: the
+# Turmbücher TrOCR on the Transkribus lines, so that its lines link to the image
+DEFAULT_READERS = ["trocr-towerbooks-tklines", "qwen3.5-4b-german-kurrent-xvi-xix-page-v1",
+                   "olmocr2-7b-german-kurrent-xvi-xix-blb-page-px4m-native-v1", "trocr-kurrent-xvi-xvii-tklines",
+                   "trocr-kurrent-xvi-xvii"]
 CORRECTED = {"GT", "DONE", "FINAL"}
 TOKEN = re.compile(r"\S+")
 

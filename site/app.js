@@ -643,7 +643,7 @@
      to. null = everything (no span, or no way to tell). */
   function spanLines(page, rd) {
     if (!page.span) return null;
-    const base = page.readings["transkribus-bestand"];
+    const base = page.readings["transkribus-bestand"] || page.readings["joint"];
     const n = rd.text.split("\n").length;
     if (rd === base) return Array.from({ length: n }, (_, i) => i >= page.span[0] && i <= page.span[1]);
     if (!base || !base.ln || !rd.ln) return null;

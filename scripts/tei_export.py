@@ -81,7 +81,7 @@ def header(vol: str, doc: str, span, tax: dict, people: dict, models: list[str],
 <respStmt><resp>Mitarbeit im Projekt «The Flow» (flow-project.net)</resp>{"".join(person(p, "name") for p in people["mitarbeitende"])}</respStmt>
 <respStmt xml:id="transkribus"><resp>Text, Zeilen und Auszeichnungen aus der Transkribus-Sammlung 187323 «StABE_Turmbücher_DH_flow»: automatische Texterkennung, auf einem Teil der Seiten von Hand korrigiert (Projekt «The Flow»)</resp><name type="software">Transkribus</name></respStmt>
 <respStmt xml:id="erschliessung"><resp>Eintragsgrenzen, Datum, Titel, Regest, Personen, Orte, Delikte, Verfahren und Ausgang: maschinell erzeugt, ungeprüft</resp>{"".join(f'<name type="model">{escape(m)}</name>' for m in models) or '<name type="model">Sprachmodell</name>'}</respStmt>
-<respStmt xml:id="lesungen"><resp>Wörter, in denen zwei weitere maschinelle Lesungen übereinstimmend vom Transkribus-Text abweichen (scripts/joint_reading.py)</resp><name type="model">qwen3.5-4b-german-kurrent-xvi-xix-page-v1</name><name type="model">trocr-kurrent-xvi-xvii</name></respStmt>
+<respStmt xml:id="lesungen"><resp>Zusammengeführte Lesung (scripts/joint_reading.py): Wörter, in denen zwei weitere maschinelle Lesungen übereinstimmend vom Transkribus-Text abweichen; auf Seiten ohne Text in Transkribus der ganze Text</resp><name type="model">qwen3.5-4b-german-kurrent-xvi-xix-page-v1</name><name type="model">olmocr2-7b-german-kurrent-xvi-xix-blb-page-px4m-native-v1</name><name type="model">trocr-kurrent-xvi-xvii</name><name type="model">trocr-towerbooks</name></respStmt>
 <respStmt xml:id="register"><resp>Verknüpfung mit Normdaten nach Regeln (scripts/register.py, scripts/places.py): Vorschläge, ungeprüft</resp><name type="software">turmbuecher-data</name></respStmt>
 <funder>Schweizerischer Nationalfonds (SNF)</funder>
 <funder>Deutsche Forschungsgemeinschaft (DFG)</funder>
@@ -145,7 +145,13 @@ def main() -> None:
         pages = {r["key"]: r for r in csv.DictReader(fh, delimiter="\t")}
     text = {r["key"]: r["text"].split("\n") for r in jsonl(ROOT / "readings" / "transkribus-bestand.jsonl")}
     ents = {r["key"]: r["entities"] for r in jsonl(ROOT / "entities" / "transkribus-bestand.jsonl")}
-    joint = {r["key"]: r for r in jsonl(ROOT / "readings" / "joint.jsonl") if r.get("backbone") == "transkribus-bestand"}
+    joint_all = {r["key"]: r for r in jsonl(ROOT / "readings" / "joint.jsonl")}
+    joint = {k: r for k, r in joint_all.items() if r.get("backbone") == "transkribus-bestand"}
+    from_joint = set()      # pages without Transkribus text: their text is the joint reading
+    for k, r in joint_all.items():
+        if k not in text and (r.get("text") or "").strip():
+            text[k] = r["text"].split("\n")
+            from_joint.add(k)
     entries = jsonl(ROOT / "entries" / "entries.jsonl")
     want = [v.strip() for v in args.volumes.split(",") if v.strip()]
 
@@ -185,7 +191,9 @@ def main() -> None:
             g = geo.get(k)
             if g and w:
                 rows = [(poly, t) for poly, t in zip(g["poly"], g["text"]) if t.strip()]
-                if [t for _, t in rows] == text.get(k):
+                if k in from_joint and not rows and len(g["poly"]) == len(text.get(k) or []):
+                    rows = [(poly, "") for poly in g["poly"]]       # the line readers read exactly these rows
+                if k in from_joint or [t for _, t in rows] == text.get(k):
                     for i, (poly, _) in enumerate(rows):
                         xs, ys = poly[0::2], poly[1::2]
                         f = w / 1e4
@@ -259,7 +267,8 @@ def main() -> None:
                     stats["choices"] += marked.count("<choice>")
                     z = zone_of.get((key, i))
                     body.append(f'<lb n="{i + 1}"{a(facs="#" + z if z else None)}/>{marked}')
-            d.append(f'<ab type="text" resp="#transkribus">{chr(10).join(body)}</ab>' if body else "<ab/>")
+            src = "#lesungen" if any(k in from_joint for k, _, _ in e["spans"]) else "#transkribus"
+            d.append(f'<ab type="text" resp="{src}">{chr(10).join(body)}</ab>' if body else "<ab/>")
             d.append("</div>")
             divs.append("\n".join(d))
 

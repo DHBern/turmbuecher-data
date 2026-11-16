@@ -48,13 +48,14 @@ def main() -> None:
     ap.add_argument("out", type=Path)
     ap.add_argument("--volumes", default="", help="comma-separated document titles (prefix match); default: all")
     ap.add_argument("--side", type=int, default=3000)
+    ap.add_argument("--workers", type=int, default=4)
     args = ap.parse_args()
     rows = [json.loads(x) for x in (args.out / "manifest.jsonl").read_text(encoding="utf-8").splitlines() if x.strip()]
     want = [v.strip() for v in args.volumes.split(",") if v.strip()]
     rows = [r for r in rows if r.get("tk") and (not want or any(r["doc"].startswith(v) for v in want))]
     (args.out / "pages").mkdir(exist_ok=True)
     counts: dict[str, int] = {}
-    with ThreadPoolExecutor(4) as ex:
+    with ThreadPoolExecutor(args.workers) as ex:
         for i, res in enumerate(ex.map(lambda r: fetch(r, args.out / "pages", args.side), rows), 1):
             counts[res] = counts.get(res, 0) + 1
             if i % 100 == 0:

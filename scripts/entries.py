@@ -131,10 +131,26 @@ def jsonl(path: Path) -> list[dict]:
     return out
 
 
+SOURCE: dict[str, str] = {}     # page key -> the reading its lines come from (filled by page_lines)
+
+
+def readers_of(reader: str) -> list[str]:
+    """``transkribus-bestand,joint``: the readings in order of preference."""
+    return [r.strip() for r in reader.split(",") if r.strip()]
+
+
 def page_lines(reader: str) -> dict[str, list[tuple[str, bool]]]:
-    """Per page key the text lines of ``reader`` with a heading flag (from the
-    Transkribus layout, where the line counts agree; else no flags)."""
-    texts = {r["key"]: r["text"].split("\n") for r in jsonl(ROOT / "readings" / f"{reader}.jsonl")}
+    """Per page key the text lines of the first reading in ``reader`` (a comma-
+    separated list in order of preference) that has the page, with a heading flag
+    (from the Transkribus layout, where the line counts agree; else no flags).
+    The Transkribus text comes first; a page without it is read in the joint
+    reading, which there rests on the line readers (scripts/joint_reading.py)."""
+    texts: dict[str, list[str]] = {}
+    for rd in readers_of(reader):
+        for r in jsonl(ROOT / "readings" / f"{rd}.jsonl"):
+            if r["key"] not in texts and (r.get("text") or "").strip():
+                texts[r["key"]] = r["text"].split("\n")
+                SOURCE[r["key"]] = rd
     geo = {r["key"]: r for path in sorted((ROOT / "readings" / "lines").glob("*.jsonl")) for r in jsonl(path)}
     out = {}
     for key, lines in texts.items():
@@ -207,7 +223,7 @@ def segment(args) -> None:
         n = len(lines[key])
         starts = sorted({int(x) for x in ans.get("starts") or [] if str(x).isdigit() and 1 <= int(x) <= n})
         log.add({"key": key, "starts": starts, "art": str(ans.get("art") or ""), "lines": n,
-                 "reader": args.reader, "model": llm.MODEL})
+                 "reader": SOURCE.get(key, args.reader), "model": llm.MODEL})
 
     run(todo, work, "segment")
 
@@ -217,7 +233,7 @@ def entry_list(reader: str) -> list[dict]:
     """The entries in order: id, volume, the (page key, first line, last line)
     spans they run over. Text before a volume's first start is entry 0 of the
     volume (front matter or the end of a case begun in another volume)."""
-    segs = {r["key"]: r for r in jsonl(ENT / "segments.jsonl") if "error" not in r and r.get("reader") == reader}
+    segs = {r["key"]: r for r in jsonl(ENT / "segments.jsonl") if "error" not in r and r.get("reader") in readers_of(reader)}
     lines = page_lines(reader)
     out, cur, vol, n = [], None, None, 0
     for p in pages():
@@ -262,7 +278,7 @@ def extract(args) -> None:
         ans = llm.parse_json(llm.chat(EXT_SYSTEM, user, 2500))
         if not isinstance(ans, dict):
             raise ValueError("not an object")
-        log.add({"id": e["id"], "spans": e["spans"], "chars": len(text), "reader": args.reader,
+        log.add({"id": e["id"], "spans": e["spans"], "chars": len(text), "reader": SOURCE.get(e["spans"][0][0], args.reader),
                  "model": llm.MODEL, "tax": VERSION, "x": ans})
 
     run(todo, work, "extract")
@@ -473,7 +489,7 @@ def write_notes(by_vol: dict[str, list[dict]]) -> None:
 
 def build(args) -> None:
     entries = entry_list(args.reader)
-    ext = {r["id"]: r for r in jsonl(ENT / "extract.jsonl") if "error" not in r and r.get("reader") == args.reader}
+    ext = {r["id"]: r for r in jsonl(ENT / "extract.jsonl") if "error" not in r and r.get("reader") in readers_of(args.reader)}
     docs = {p["volume"]: p["doc"] for p in pages()}
     by_vol: dict[str, list[dict]] = {}
     labels = {r["id"]: r for r in jsonl(ENT / "labels.jsonl") if "error" not in r}   # the latest line per entry wins
@@ -501,12 +517,12 @@ def build(args) -> None:
         title = make_title(x) if x and x["art"] != "register" else ""
         rec.append({"id": e["id"], "volume": e["volume"], "nr": e["nr"], "kind": (x or {}).get("art") or e["kind"],
                     "spans": e["spans"], "year": e.get("year"), "year_source": e.get("year_source", ""),
-                    "title": title, "reader": args.reader, "model": e["model"], "tax": e.get("tax"),
+                    "title": title, "reader": SOURCE.get(e["spans"][0][0], args.reader), "model": e["model"], "tax": e.get("tax"),
                     "year_note": e.get("year_note", ""), **(x or {})})
         units.append({"id": e["id"], "shelf": e["volume"], "nr": e["nr"], "title": "", "pages": ";".join(keys),
                       "spans": json.dumps(e["spans"], separators=(",", ":"))})
         if x and x["regest"]:
-            drafts.append({"id": e["id"], "heading": title, "reader": args.reader, "model": e["model"],
+            drafts.append({"id": e["id"], "heading": title, "reader": SOURCE.get(e["spans"][0][0], args.reader), "model": e["model"],
                            "draft": {"regest": x["regest"], "year": e.get("year"), "year_source": e.get("year_source", ""),
                                      "year_note": e.get("year_note", ""),
                                      "date_text": x["datum_text"],
@@ -543,7 +559,7 @@ def relabel(args) -> None:
     One short call per entry; dates, persons and regests are not redone."""
     lines = page_lines(args.reader)
     want = {p["volume"] for p in selected(args)}
-    ext = {r["id"]: r for r in jsonl(ENT / "extract.jsonl") if "error" not in r and r.get("reader") == args.reader}
+    ext = {r["id"]: r for r in jsonl(ENT / "extract.jsonl") if "error" not in r and r.get("reader") in readers_of(args.reader)}
     labels = {r["id"]: r for r in jsonl(ENT / "labels.jsonl") if "error" not in r}
     log = Log(ENT / "labels.jsonl", "id")
     todo = []
@@ -596,7 +612,8 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("step", choices=["segment", "extract", "build", "relabel", "vorschlaege"])
     ap.add_argument("--volumes", default="")
-    ap.add_argument("--reader", default="transkribus-bestand")
+    ap.add_argument("--reader", default="transkribus-bestand,joint",
+                    help="readings in order of preference, comma-separated (a page is read in the first that has it)")
     ap.add_argument("--force", action="store_true", help="relabel: also entries already labelled under the current version")
     args = ap.parse_args()
     {"segment": segment, "extract": extract, "build": build, "relabel": relabel, "vorschlaege": vorschlaege}[args.step](args)

@@ -122,7 +122,11 @@ def link_lines(rec: dict, geo: dict) -> dict[str, tuple[int, int]]:
     for reader, entry in rec["readings"].items():
         if not entry.get("text"):
             continue
-        ln = line_links.align(entry["text"].split("\n"), row_texts)
+        lines = entry["text"].split("\n")
+        if not any(t.strip() for t in geo["text"]) and len(lines) == len(geo["poly"]):
+            ln = [[i] for i in range(len(lines))]     # no Transkribus text: a line reader read exactly these rows
+        else:
+            ln = line_links.align(lines, row_texts)
         entry["ln"] = ln
         counts[reader] = (sum(1 for x in ln if x), len(ln))
     return counts
