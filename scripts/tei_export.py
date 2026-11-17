@@ -99,7 +99,7 @@ def header(vol: str, doc: str, span, tax: dict, people: dict, models: list[str],
 </fileDesc>
 <encodingDesc>
 <projectDesc><p>Prototyp für die Suche in den Berner Turmbüchern und ihre inhaltliche Erschliessung, hervorgegangen aus dem Projekt «The Flow» (SNF/DFG, 2023–2026).</p></projectDesc>
-<editorialDecl><p>Kein edierter Text. Der Text ist der Stand der Transkribus-Sammlung: Seiten, deren <gi>surface</gi> den Typ <val>ground-truth</val> trägt, sind dort als Ground Truth markiert; alle übrigen sind unkorrigierte Maschinenlesung. Die Gliederung in Einträge und alles, was <att>resp</att> auf <val>#erschliessung</val> verweist, hat ein Sprachmodell erzeugt; niemand hat es geprüft. Jahre gelten nur innerhalb der Spanne des Bandes; <att>cert</att> an <gi>date</gi> sagt, ob das Jahr im Eintrag genannt (<val>medium</val>), berichtigt oder vom vorangehenden Eintrag übernommen ist (<val>low</val>). Normdaten-Kennungen sind Vorschläge.</p></editorialDecl>
+<editorialDecl><p>Kein edierter Text. Der Text ist ausschliesslich Maschinenlesung: die Ausgabe der Erkennungsmodelle in Transkribus, unverändert, und wo diese fehlt die gemeinsame Lesung offener Modelle. Die von Hand geprüfte Ground Truth erscheint am 1. Juli 2027; Seiten, für die es sie gibt, tragen an <gi>surface</gi> den Typ <val>maschinenlesung-gt-vorbehalten</val>. Die Gliederung in Einträge und alles, was <att>resp</att> auf <val>#erschliessung</val> verweist, hat ein Sprachmodell erzeugt; niemand hat es geprüft. Jahre gelten nur innerhalb der Spanne des Bandes; <att>cert</att> an <gi>date</gi> sagt, ob das Jahr im Eintrag genannt (<val>medium</val>), berichtigt oder vom vorangehenden Eintrag übernommen ist (<val>low</val>). Normdaten-Kennungen sind Vorschläge.</p></editorialDecl>
 <classDecl>
 <taxonomy xml:id="delikte" n="{tax.get("version", 1)}"><bibl>Deliktvokabular des Prototyps, Version {tax.get("version", 1)} (taxonomy/delikte.json), erweiterbar</bibl>{cats}</taxonomy>
 <taxonomy xml:id="verfahren"><bibl>Verfahren</bibl>{proc}</taxonomy>
@@ -202,7 +202,7 @@ def main() -> None:
                         zid = f"{xid(k)}_l{i + 1}"
                         zone_of[(k, i)] = zid
                         zones += f'<zone xml:id="{zid}" ulx="{round(min(xs) * f)}" uly="{round(min(ys) * f)}" lrx="{round(max(xs) * f)}" lry="{round(max(ys) * f)}"/>'
-            typ = "ground-truth" if p["status"] in ("GT", "DONE", "FINAL") else "maschinenlesung"
+            typ = "maschinenlesung-gt-vorbehalten" if p["status"] in ("GT", "DONE", "FINAL") else "maschinenlesung"   # GT text from 1.7.2027
             fac.append(f'<surface xml:id="{xid(k)}" n="{p["pageNr"]}" type="{typ}"{a(ulx=0, uly=0, lrx=w or None, lry=h or None)}>'
                        f'<graphic url="{IIIF}{p["tk"]}/full/max/0/default.jpg"/>{zones}</surface>')
 

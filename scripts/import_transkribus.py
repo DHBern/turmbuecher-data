@@ -28,6 +28,14 @@ Outputs:
   spans of the page text: ``{"key", "entities": [{"start", "end", "type",
   "text"}]}``. Who or what set these tags is not recorded in Transkribus.
 
+Only machine readings are published until the Ground Truth appears on 1 July
+2027 (``readings/vorbehalt.tsv``, written by ``scripts/vorbehalt.py``): where a
+page's text is Ground Truth or corrected by hand, the newest HTR version of the
+page is read instead (``_ingest/pagexml_public/<key>.xml``) or, without one, the
+page keeps its lines but no text; a page empty here takes over the machine
+reading of an older collection. Pages with Ground Truth anywhere get the status
+``GT`` in ``pages.tsv``.
+
 Nothing personal is carried over (the manifest holds no user names; the check
 below fails the run if an e-mail address would end up in an output file).
 """
@@ -231,16 +239,25 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("manifest", type=Path)
     ap.add_argument("pagexml", type=Path)
+    ap.add_argument("--vorbehalt", type=Path, default=ROOT / "readings" / "vorbehalt.tsv")
+    ap.add_argument("--public", type=Path, default=ROOT / "_ingest" / "pagexml_public")
     args = ap.parse_args()
+    with args.vorbehalt.open(encoding="utf-8") as fh:
+        vb = {r["key"]: r for r in csv.DictReader(fh, delimiter="\t")}
 
     rows = [json.loads(x) for x in args.manifest.read_text(encoding="utf-8").splitlines() if x.strip()]
     rows.sort(key=lambda r: (doc_sort_key(r["doc"]), int(r["pageNr"])))
     readings, table, geo, entities, missing = [], [], [], [], 0
     for r in rows:
         xml = args.pagexml / f"{r['key']}.xml"
+        v = vb.get(r["key"]) or {}
+        if v.get("text") in ("htr", "andere-sammlung"):
+            xml = args.public / f"{r['key']}.xml"
         text, ents, n_text = "", [], 0
         if xml.exists():
             lines, size = read_page(xml)
+            if v.get("text") == "keiner":          # Ground Truth or hand-made, no machine version: lines only
+                lines = [dict(x, text="", tags=[]) for x in lines]
             text, ents = page_text(lines)
             n_text = len(text.split("\n")) if text else 0
             g = geometry(r["key"], lines, size)
@@ -250,7 +267,7 @@ def main() -> None:
             missing += 1
         table.append({"key": r["key"], "volume": volume(r["doc"]), "doc": r["doc"], "docId": r["docId"],
                       "pageNr": int(r["pageNr"]), "width": r.get("width") or "", "height": r.get("height") or "",
-                      "status": r.get("status") or "", "lines": r.get("lines") or 0, "text_lines": n_text,
+                      "status": "GT" if v.get("ground_truth") else (r.get("status") or ""), "lines": r.get("lines") or 0, "text_lines": n_text,
                       "tk": r.get("tk") or ""})
         if text:
             readings.append({"key": r["key"], "text": text})

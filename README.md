@@ -44,8 +44,15 @@ Viewer: <https://dhbern.github.io/turmbuecher-data/> (abgeleitet aus dem der
   `taxonomy/verantwortliche.json`. Der Viewer bietet den Download je Band und je Eintrag.
 - **Auswertung:** Sankey Zeitraum → Delikt → zusammen genannte Delikte bzw. Ausgang, Delikte über
   die Zeit, Häufigkeit der Delikte (`site/analysis.js`).
-- **Lesungen:** der Text aus Transkribus (`transkribus-bestand`); ausser auf den Ground-Truth-Seiten
-  unkorrigierte Maschinenlesung. Weitere Lesungen mit eigenen Modellen (Qwen3.5-4B Kurrent, TrOCR
+- **Nur Maschinenlesung bis 1. Juli 2027:** Die Ground Truth (von Hand geprüfte Transkriptionen
+  aus «The Flow» und den Lehrveranstaltungen) wird am 1. Juli 2027 veröffentlicht. Bis dahin wird
+  von Transkribus nur Text übernommen, der die unveränderte Ausgabe eines Erkennungsmodells ist
+  (Abgleich mit der jüngsten HTR-Fassung jeder Seite in den Sammlungen 89729 und 63705); auf
+  Ground-Truth-Seiten und von Hand korrigierten Seiten steht die HTR-Fassung oder nur die Lesung
+  der eigenen Modelle (`scripts/vorbehalt.py` → `readings/vorbehalt.tsv`). Seiten, die in 187323
+  leer sind, übernehmen die Maschinenlesung der älteren Sammlungen (z. B. B IX 505). Liste der Bände
+  mit Ground Truth: [`ground-truth/`](ground-truth/README.md).
+- **Lesungen:** der maschinelle Text aus Transkribus (`transkribus-bestand`). Weitere Lesungen mit eigenen Modellen (Qwen3.5-4B Kurrent, TrOCR
   Kurrent) laufen und werden zu einer gemeinsamen Lesung zusammengeführt
   (`scripts/joint_reading.py`): ein Wort ändert sich nur, wo zwei andere Leser übereinstimmen. Ein
   Abgleich mit Ground Truth ist nicht das Ziel.
@@ -90,7 +97,7 @@ in `site/config.json` unter `langs` eintragen. Fehlende Schlüssel fallen auf De
 
 ## Verantwortliche
 
-Herausgegeben von Tobias Hodel, Dominic Weber, Jonas Widmer, Anna Funk und Myrjam Hostettler
+Herausgegeben von Tobias Hodel, Dominic Weber, Jonas Widmer, Anna Funk, Myrjam Hostettler und Christa Schneider
 (Universität Bern). Mitarbeit im Projekt «The Flow»: Angela Huang, Silke Schwandt, Serena Tolino,
 Sefer Korkmaz, Christopher Kuhlmann, Inga Lange, Dana Meyer, Bart Holterman, Mohamed Ilyes
 Mechentel, Melvin Wilde, Judith Neubauer, Vivien Popken.

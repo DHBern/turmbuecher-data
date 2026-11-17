@@ -6,7 +6,9 @@ Reads ``OUT/manifest.jsonl`` (ops/ingest_transkribus.py) and writes
 ``OUT/pages/<key>.jpg``: the page as the IIIF server delivers it, i.e. already
 turned upright (the uploaded files carry an EXIF rotation; the PAGE XML
 coordinates refer to the upright image), longest side at most ``--side`` px.
-Resumable; needs no login (the image keys are public identifiers).
+Where the IIIF server refuses the size (403, whole volumes on 16.11.2026), the
+original file is fetched instead and turned upright and scaled here, needing
+Pillow. Resumable; needs no login (the image keys are public identifiers).
 """
 
 from __future__ import annotations
@@ -20,6 +22,22 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 IIIF = "https://files.transkribus.eu/iiif/2/"
+
+
+def from_original(row: dict, dest: Path, side: int) -> None:
+    """The original file (Transkribus ``Get?fileType=orig``), turned upright by its
+    EXIF orientation and scaled to at most ``side``: the same image the IIIF
+    server would deliver. Used where the IIIF server refuses the size (403)."""
+    import io
+    from PIL import Image, ImageOps
+    data = urllib.request.urlopen(f"https://files.transkribus.eu/Get?id={row['tk']}&fileType=orig", timeout=300).read()
+    im = ImageOps.exif_transpose(Image.open(io.BytesIO(data)))
+    if row.get("width") and row.get("height") and im.size != (int(row["width"]), int(row["height"])):
+        raise ValueError(f"upright original is {im.size}, Transkribus says {row['width']}x{row['height']}")
+    im.thumbnail((side, side))
+    tmp = dest.with_suffix(".part")
+    im.convert("RGB").save(tmp, "JPEG", quality=90)
+    tmp.replace(dest)
 
 
 def fetch(row: dict, out: Path, side: int) -> str:
@@ -38,6 +56,12 @@ def fetch(row: dict, out: Path, side: int) -> str:
             return "fetched"
         except Exception as e:  # noqa: BLE001
             err = repr(e)[:120]
+            if "HTTP Error 403" in str(e) or getattr(e, "code", None) == 403:
+                try:
+                    from_original(row, dest, side)
+                    return "original"
+                except Exception as e2:  # noqa: BLE001
+                    err = "original: " + repr(e2)[:120]
             time.sleep(3 * (attempt + 1))
     print(f"  {row['key']}: {err}", file=sys.stderr, flush=True)
     return "failed"

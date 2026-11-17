@@ -6,7 +6,8 @@
     python scripts/entries.py relabel             # after the vocabulary has grown
     python scripts/entries.py vorschlaege         # what the vocabulary does not cover yet
 
-Three steps, each resumable (a page or entry already answered is not asked again):
+Three steps, each resumable (a page or entry already answered is not asked again; an
+answer counts only while the text it was given is unchanged — ``sha`` in every record):
 
 ``segment``  One call per page to an open language model (scripts/llm.py): the
              page's lines, numbered, with the end of the previous page as context
@@ -43,6 +44,7 @@ from __future__ import annotations
 import argparse
 import collections
 import csv
+import hashlib
 import json
 import re
 import sys
@@ -164,6 +166,27 @@ def page_lines(reader: str) -> dict[str, list[tuple[str, bool]]]:
     return out
 
 
+def sha(text: str) -> str:
+    """Fingerprint of the text an answer was given: an answer whose text has
+    changed since (another reading, text withheld) is asked again."""
+    return hashlib.sha1(text.encode("utf-8")).hexdigest()[:12]
+
+
+def page_sha(lines: dict, key: str) -> str:
+    return sha("\n".join(t for t, _ in lines.get(key, [])))
+
+
+def latest(path: Path, idkey: str) -> dict[str, dict]:
+    """The latest answer per id (the logs are append-only)."""
+    return {r[idkey]: r for r in jsonl(path) if "error" not in r}
+
+
+def by_text(path: Path) -> dict[str, dict]:
+    """The latest answer per text fingerprint: an entry renumbered because an
+    earlier page of its volume changed keeps the answer to its unchanged text."""
+    return {r["sha"]: r for r in jsonl(path) if "error" not in r and r.get("sha")}
+
+
 def selected(args) -> list[dict]:
     want = [v.strip() for v in (args.volumes or "").split(",") if v.strip()]
     return [p for p in pages() if not want or p["volume"] in want]
@@ -204,6 +227,7 @@ def run(items: list, work, label: str) -> None:
 def segment(args) -> None:
     lines = page_lines(args.reader)
     log = Log(ENT / "segments.jsonl", "key")
+    have = latest(ENT / "segments.jsonl", "key")
     todo, prev = [], {}
     last_by_vol: dict[str, str] = {}
     for p in selected(args):
@@ -211,7 +235,7 @@ def segment(args) -> None:
         if key in lines:
             prev[key] = last_by_vol.get(p["volume"])
             last_by_vol[p["volume"]] = key
-            if key not in log.done:
+            if (have.get(key) or {}).get("sha") != page_sha(lines, key):
                 todo.append(key)
 
     def work(key: str) -> None:
@@ -222,7 +246,7 @@ def segment(args) -> None:
         ans = llm.parse_json(llm.chat(SEG_SYSTEM, user, 300))
         n = len(lines[key])
         starts = sorted({int(x) for x in ans.get("starts") or [] if str(x).isdigit() and 1 <= int(x) <= n})
-        log.add({"key": key, "starts": starts, "art": str(ans.get("art") or ""), "lines": n,
+        log.add({"key": key, "starts": starts, "art": str(ans.get("art") or ""), "lines": n, "sha": page_sha(lines, key),
                  "reader": SOURCE.get(key, args.reader), "model": llm.MODEL})
 
     run(todo, work, "segment")
@@ -233,8 +257,9 @@ def entry_list(reader: str) -> list[dict]:
     """The entries in order: id, volume, the (page key, first line, last line)
     spans they run over. Text before a volume's first start is entry 0 of the
     volume (front matter or the end of a case begun in another volume)."""
-    segs = {r["key"]: r for r in jsonl(ENT / "segments.jsonl") if "error" not in r and r.get("reader") in readers_of(reader)}
     lines = page_lines(reader)
+    segs = {k: r for k, r in latest(ENT / "segments.jsonl", "key").items()
+            if r.get("reader") in readers_of(reader) and r.get("sha") == page_sha(lines, k)}
     out, cur, vol, n = [], None, None, 0
     for p in pages():
         key = p["key"]
@@ -267,18 +292,21 @@ def extract(args) -> None:
     docs = {p["volume"]: p["doc"] for p in pages()}
     want = {p["volume"] for p in selected(args)}
     log = Log(ENT / "extract.jsonl", "id")
-    todo = [e for e in entry_list(args.reader) if e["volume"] in want and e["id"] not in log.done
+    have = by_text(ENT / "extract.jsonl")
+    todo = [e for e in entry_list(args.reader) if e["volume"] in want
+            and sha(entry_text(e, lines)) not in have
             and e["kind"] not in ("register", "titel", "leer")]
 
     def work(e: dict) -> None:
         text = entry_text(e, lines)
+        fp = sha(text)
         if len(text) > MAX_HEAD + MAX_TAIL:
             text = text[:MAX_HEAD] + "\n[…]\n" + text[-MAX_TAIL:]
         user = f"Band: {docs[e['volume']]}\n\nEINTRAG:\n{text}"
         ans = llm.parse_json(llm.chat(EXT_SYSTEM, user, 2500))
         if not isinstance(ans, dict):
             raise ValueError("not an object")
-        log.add({"id": e["id"], "spans": e["spans"], "chars": len(text), "reader": SOURCE.get(e["spans"][0][0], args.reader),
+        log.add({"id": e["id"], "spans": e["spans"], "chars": len(text), "sha": fp, "reader": SOURCE.get(e["spans"][0][0], args.reader),
                  "model": llm.MODEL, "tax": VERSION, "x": ans})
 
     run(todo, work, "extract")
@@ -489,15 +517,19 @@ def write_notes(by_vol: dict[str, list[dict]]) -> None:
 
 def build(args) -> None:
     entries = entry_list(args.reader)
-    ext = {r["id"]: r for r in jsonl(ENT / "extract.jsonl") if "error" not in r and r.get("reader") in readers_of(args.reader)}
+    lines = page_lines(args.reader)
+    ext = {k: r for k, r in latest(ENT / "extract.jsonl", "id").items() if r.get("reader") in readers_of(args.reader)}
     docs = {p["volume"]: p["doc"] for p in pages()}
     by_vol: dict[str, list[dict]] = {}
-    labels = {r["id"]: r for r in jsonl(ENT / "labels.jsonl") if "error" not in r}   # the latest line per entry wins
+    labels = by_text(ENT / "labels.jsonl")
+    ext_text = {k: r for k, r in by_text(ENT / "extract.jsonl").items() if r.get("reader") in readers_of(args.reader)}
     for e in entries:
+        fp = sha(entry_text(e, lines))
         r = ext.get(e["id"])
+        r = r if r and r.get("sha") == fp else ext_text.get(fp)    # an answer to another text does not count
+        lab = labels.get(fp)
         e["x"] = clean(r["x"]) if r else None
         e["tax"] = int(r.get("tax") or 1) if r else None
-        lab = labels.get(e["id"])
         if e["x"] and lab and int(lab.get("tax") or 1) >= e["tax"]:
             e["x"]["delikte"] = clean({"delikte": lab["delikte"]})["delikte"]
             e["x"]["delikt_vorschlag"] = str(lab.get("vorschlag") or "").strip()
@@ -559,15 +591,18 @@ def relabel(args) -> None:
     One short call per entry; dates, persons and regests are not redone."""
     lines = page_lines(args.reader)
     want = {p["volume"] for p in selected(args)}
-    ext = {r["id"]: r for r in jsonl(ENT / "extract.jsonl") if "error" not in r and r.get("reader") in readers_of(args.reader)}
-    labels = {r["id"]: r for r in jsonl(ENT / "labels.jsonl") if "error" not in r}
+    ext = {k: r for k, r in latest(ENT / "extract.jsonl", "id").items() if r.get("reader") in readers_of(args.reader)}
+    ext_text = {k: r for k, r in by_text(ENT / "extract.jsonl").items() if r.get("reader") in readers_of(args.reader)}
+    labels = by_text(ENT / "labels.jsonl")
     log = Log(ENT / "labels.jsonl", "id")
     todo = []
     for e in entry_list(args.reader):
+        e["sha"] = sha(entry_text(e, lines))
         r = ext.get(e["id"])
+        r = r if r and r.get("sha") == e["sha"] else ext_text.get(e["sha"])
         if not r or e["volume"] not in want:
             continue
-        lab = labels.get(e["id"])
+        lab = labels.get(e["sha"])
         e["at"] = max(int(r.get("tax") or 1), int(lab.get("tax") or 1) if lab else 0)
         e["now"] = clean({"delikte": (lab or {}).get("delikte") if lab and int(lab.get("tax") or 1) >= int(r.get("tax") or 1)
                           else (r["x"].get("delikte") if isinstance(r.get("x"), dict) else [])})["delikte"]
@@ -585,7 +620,7 @@ def relabel(args) -> None:
                 "; ".join(f"{d['id']} ({d['label']}: {d['hinweis']})" for d in new) + f"\n\nEINTRAG:\n{text}")
         ans = llm.parse_json(llm.chat(REL_SYSTEM, user, 200))
         log.add({"id": e["id"], "delikte": ans.get("delikte") if isinstance(ans.get("delikte"), list) else e["now"],
-                 "vorschlag": ans.get("vorschlag"), "tax": VERSION, "model": llm.MODEL})
+                 "vorschlag": ans.get("vorschlag"), "tax": VERSION, "model": llm.MODEL, "sha": e["sha"]})
 
     print(f"vocabulary version {VERSION}: {len(todo)} entries to label again")
     run(todo, work, "relabel")

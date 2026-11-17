@@ -1,11 +1,12 @@
 {
- "_": "Verantwortliche, wie sie im TEI-Kopf und auf der Seite «Über» stehen. Herausgebende: das Berner Turmbücher-Team; Mitarbeitende: das übrige Team des Projekts «The Flow» (flow-project.net, Stand 15.11.2026). ORCID, wo die Flow-Seite eine nennt.",
+ "_": "Verantwortliche, wie sie im TEI-Kopf und auf der Seite «Über» stehen. Herausgebende: das Berner Turmbücher-Team, dazu Christa Schneider (Tobias, 17.11.2026); Mitarbeitende: das übrige Team des Projekts «The Flow» (flow-project.net, Stand 15.11.2026). ORCID, wo die Flow-Seite eine nennt.",
  "herausgebende": [
   {"name": "Tobias Hodel", "orcid": "0000-0002-2071-6407", "ort": "Universität Bern"},
   {"name": "Dominic Weber", "orcid": "0000-0002-9265-3388", "ort": "Universität Bern"},
   {"name": "Jonas Widmer", "orcid": "0000-0001-9690-5645", "ort": "Universität Bern"},
   {"name": "Anna Funk", "ort": "Universität Bern"},
-  {"name": "Myrjam Hostettler", "ort": "Universität Bern"}
+  {"name": "Myrjam Hostettler", "ort": "Universität Bern"},
+  {"name": "Christa Schneider", "ort": "Universität Bern"}
  ],
  "mitarbeitende": [
   {"name": "Angela Huang", "orcid": "0000-0002-5321-9888", "ort": "Forschungsstelle für die Geschichte der Hanse und des Ostseeraums, Europäisches Hansemuseum Lübeck"},

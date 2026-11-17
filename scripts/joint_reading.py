@@ -10,8 +10,9 @@ by eye in the viewer:
   (``transkribus-bestand``): it carries the line breaks the image is linked to.
   Where a page has no such text, the backbone is the first reader in
   ``--readers`` that has read the page.
-* A page Transkribus marks as ground truth (GT, DONE, FINAL) is taken over
-  unchanged.
+* No page is taken over unchanged: until 1 July 2027 the Ground Truth is not
+  published, and the backbone of a Ground-Truth page is its machine (HTR)
+  version (``readings/vorbehalt.tsv``), voted on like any other.
 * Elsewhere a word of the backbone is replaced only where **at least two other
   readers agree on the same different word** at that place. Only one-to-one
   word substitutions are voted on; insertions, deletions and line breaks stay
@@ -44,7 +45,7 @@ BACKBONE = "transkribus-bestand"
 DEFAULT_READERS = ["trocr-towerbooks-tklines", "qwen3.5-4b-german-kurrent-xvi-xix-page-v1",
                    "olmocr2-7b-german-kurrent-xvi-xix-blb-page-px4m-native-v1", "trocr-kurrent-xvi-xvii-tklines",
                    "trocr-kurrent-xvi-xvii"]
-CORRECTED = {"GT", "DONE", "FINAL"}
+CORRECTED: set[str] = set()   # Ground Truth withheld until 1.7.2027 (scripts/vorbehalt.py)
 TOKEN = re.compile(r"\S+")
 
 
