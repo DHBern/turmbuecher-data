@@ -50,4 +50,20 @@ def parse_json(text: str):
     start = min([i for i in (text.find("{"), text.find("[")) if i >= 0], default=-1)
     if start < 0:
         raise ValueError("no JSON in the answer")
-    return json.JSONDecoder().raw_decode(text[start:])[0]
+    try:
+        return json.JSONDecoder().raw_decode(text[start:])[0]
+    except json.JSONDecodeError:
+        return json.JSONDecoder().raw_decode(_loose_strings(text[start:]))[0]
+
+
+_STR = r'"(?:[^"\\]|\\.)*"'
+_LOOSE = re.compile(rf'^(\s*"[^"]+":\s*)({_STR}(?:\s*,\s*{_STR})+)(\s*,?\s*)$', re.M)
+
+
+def _loose_strings(text: str) -> str:
+    """A key followed by several strings without brackets (``"k": "a", "b",``),
+    which the model writes now and then for a quoted field: joined into one string."""
+    def join(m: re.Match) -> str:
+        parts = [json.loads(s) for s in re.findall(_STR, m.group(2))]
+        return m.group(1) + json.dumps("; ".join(parts), ensure_ascii=False) + m.group(3)
+    return _LOOSE.sub(join, text)
