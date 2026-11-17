@@ -30,6 +30,11 @@
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const pct = (x) => (x == null ? "–" : (x * 100).toLocaleString(t("locale"), { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + " %");
   const json = (p) => fetch(p).then((r) => { if (!r.ok) throw new Error(p + ": " + r.status); return r.json(); });
+  // units and search shards are stored gzip-compressed (data/…/*.json.gz)
+  const gzjson = (p) => fetch(p).then((r) => {
+    if (!r.ok) throw new Error(p + ": " + r.status);
+    return new Response(r.body.pipeThrough(new DecompressionStream("gzip"))).json();
+  });
 
   async function loadLang(l) {
     STR = l === state.cfg.langs[0] ? BASE : await json(`i18n/${l}.json`);
@@ -208,7 +213,7 @@
 
   /* ---------- search ----------
      Full text over the units, in one reading. The text is sharded per reader
-     (data/search/<reader>/text-N.json: unit id -> its page texts) and loaded,
+     (data/search/<reader>/text-N.json.gz: unit id -> its page texts) and loaded,
      in parallel, only once a query is typed. Without a query the facets alone
      select. The whole search lives in the URL. */
   const FACETS = ["vol", "of", "dec", "st", "dr"];
@@ -220,7 +225,7 @@
   function searchTexts(reader) {
     if (!texts.has(reader)) {
       const n = state.index.search[reader] || 0;
-      texts.set(reader, Promise.all(Array.from({ length: n }, (_, i) => json(`data/search/${encodeURIComponent(reader)}/text-${i}.json`)))
+      texts.set(reader, Promise.all(Array.from({ length: n }, (_, i) => gzjson(`data/search/${encodeURIComponent(reader)}/text-${i}.json.gz`)))
         .then((shards) => Object.assign({}, ...shards)));
     }
     return texts.get(reader);
@@ -424,7 +429,7 @@
     const pos = state.pos.get(id);
     if (pos == null) return null;
     const c = Math.floor(pos / state.index.chunk);
-    if (!state.chunks.has(c)) state.chunks.set(c, json(`data/units/${c}.json`));
+    if (!state.chunks.has(c)) state.chunks.set(c, gzjson(`data/units/${c}.json.gz`));
     return (await state.chunks.get(c)).find((u) => u.id === id) || null;
   }
 

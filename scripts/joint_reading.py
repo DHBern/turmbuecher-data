@@ -18,6 +18,9 @@ by eye in the viewer:
   word substitutions are voted on; insertions, deletions and line breaks stay
   as the backbone has them. One other reader alone never changes anything.
 
+A reading that was cut off at the token limit or runs in a loop (one line, or
+a handful of words, over and over) takes no part: not as backbone, not as vote.
+
 Only pages where something was combined are written (two or more other
 readers, or no Transkribus text): elsewhere the joint reading would be the
 Transkribus text under another name.
@@ -35,7 +38,7 @@ import csv
 import difflib
 import json
 import re
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -43,19 +46,31 @@ BACKBONE = "transkribus-bestand"
 # the first reader a page has is its backbone where Transkribus has no text: the
 # Turmbücher TrOCR on the Transkribus lines, so that its lines link to the image
 DEFAULT_READERS = ["trocr-towerbooks-tklines", "qwen3.5-4b-german-kurrent-xvi-xix-page-v1",
-                   "olmocr2-7b-german-kurrent-xvi-xix-blb-page-px4m-native-v1", "trocr-kurrent-xvi-xvii-tklines",
-                   "trocr-kurrent-xvi-xvii"]
+                   "olmocr2-7b-german-kurrent-xvi-xix-blb-page-px4m-native-v1", "trocr-kurrent-xvi-xvii-tklines"]
 CORRECTED: set[str] = set()   # Ground Truth withheld until 1.7.2027 (scripts/vorbehalt.py)
 TOKEN = re.compile(r"\S+")
 
 
+def looping(text: str) -> bool:
+    """A reading caught in a loop: few distinct words, or one line over and over
+    (page models do this on blank or register pages, until the token limit)."""
+    toks = text.split()
+    if len(toks) < 30:
+        return False
+    lines = [x.strip() for x in text.splitlines() if x.strip()]
+    top = max(Counter(lines).values(), default=0)
+    return len(set(toks)) / len(toks) < 0.25 or top >= max(8, len(lines) * 0.3)
+
+
 def load(reader: str) -> dict[str, str]:
+    """A reader's pages; truncated and looping readings are left out, as backbone
+    and as vote."""
     path = ROOT / "readings" / f"{reader}.jsonl"
     out = {}
     for line in path.read_text(encoding="utf-8").splitlines() if path.exists() else []:
         r = json.loads(line)
         text = "\n".join(x.rstrip() for x in (r.get("text") or "").splitlines() if x.strip())
-        if text:
+        if text and not r.get("truncated") and (reader == BACKBONE or not looping(text)):
             out[r["key"]] = text
     return out
 

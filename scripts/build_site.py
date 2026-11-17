@@ -28,18 +28,22 @@ Outputs (site/data/)
   index.json                    units (id, shelf, nr, pages, thumbnail, status, draft
                                 heading, year), volumes, search shard counts
   readers.json                  readers with pages read and pairwise disagreement
-  units/<n>.json                CHUNK units in index order, each with its pages, every
+  units/<n>.json.gz             CHUNK units in index order, each with its pages, every
                                 reading, the image and the draft; a page with lines
                                 carries ``rows`` (each line's outline), ``rt`` (the
                                 region type of each row) and every reading ``ln`` (per
                                 text line the rows it is linked to)
   pagekeys.json                 page key -> [unit id, page position]
-  search/<reader>/text-<n>.json unit id -> page texts, loaded only by a search
+  search/<reader>/text-<n>.json.gz unit id -> page texts, loaded only by a search
+
+units and search shards are gzip-compressed (the viewer inflates them with
+DecompressionStream): as plain JSON they come near the 1 GB a Pages site may hold.
 """
 
 from __future__ import annotations
 
 import csv
+import gzip
 import itertools
 import json
 import shutil
@@ -182,6 +186,12 @@ def load_drafts(letter_ids: set[str]) -> dict[str, dict]:
     return out
 
 
+def write_gz(path: Path, obj) -> None:
+    """Compact JSON, gzip-compressed (mtime 0, so an unchanged file stays byte-identical)."""
+    raw = json.dumps(obj, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    path.write_bytes(gzip.compress(raw, compresslevel=9, mtime=0))
+
+
 def write_search(letters: list[dict], readings: dict[str, dict[str, dict]], readers: list[str]) -> dict[str, int]:
     """Per reader: letter id -> the text of each of its pages ("" if unread),
     in the letter's page order (pages, then the further scans)."""
@@ -204,7 +214,7 @@ def write_search(letters: list[dict], readings: dict[str, dict[str, dict]], read
         if cur:
             shards.append(cur)
         for i, shard in enumerate(shards):
-            (folder / f"text-{i}.json").write_text(json.dumps(shard, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+            write_gz(folder / f"text-{i}.json.gz", shard)
         shards_of[reader] = len(shards)
     return shards_of
 
@@ -358,7 +368,7 @@ def main() -> None:
             row.update({"h": d["heading"], "y": d["year"], "o": d["offences"]})
         index.append(row)
         if len(chunk) == CHUNK or pos == len(letters) - 1:
-            (OUT / "units" / f"{pos // CHUNK}.json").write_text(json.dumps(chunk, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+            write_gz(OUT / "units" / f"{pos // CHUNK}.json.gz", chunk)
             chunk = []
 
     for r in readers:
