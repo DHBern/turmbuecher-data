@@ -14700,3 +14700,19 @@
 {"key": "B_IX_509_p0188", "starts": [], "art": "register", "lines": 11, "sha": "843979dfbbcf", "reader": "joint", "model": "qwen3.8-27b"}
 {"key": "B_IX_508_p0002", "starts": [], "art": "leer", "lines": 1, "sha": "77e6b92a1f7b", "reader": "joint", "model": "qwen3.8-27b"}
 {"key": "B_IX_508_p0012", "starts": [], "art": "leer", "lines": 2, "sha": "a116b20d4edc", "reader": "joint", "model": "qwen3.8-27b"}
+{"key": "B_IX_451_p0053", "starts": [2], "art": "verhoer", "lines": 62, "sha": "500f90dae293", "reader": "joint", "model": "qwen3.8-27b"}
+{"key": "B_IX_427_p0002", "starts": [1], "art": "verhoer", "lines": 4, "sha": "af56eee0b3a8", "reader": "joint", "model": "qwen3.8-27b"}
+{"key": "B_IX_451_p0006", "starts": [], "art": "verhoer", "lines": 64, "sha": "d8e6a9ccb396", "reader": "joint", "model": "qwen3.8-27b"}
+{"key": "B_IX_451_p0054", "starts": [], "art": "verhoer", "lines": 63, "sha": "1a1d00ea8552", "reader": "joint", "model": "qwen3.8-27b"}
+{"key": "B_IX_451_p0005", "starts": [28, 32], "art": "verhoer", "lines": 63, "sha": "d8dce340467f", "reader": "joint", "model": "qwen3.8-27b"}
+{"key": "B_IX_451_p0007", "starts": [2, 32], "art": "verhoer", "lines": 54, "sha": "f374bb2e6c46", "reader": "joint", "model": "qwen3.8-27b"}
+{"key": "B_IX_451_p0067", "starts": [36], "art": "verhoer", "lines": 69, "sha": "e2b0920a868d", "reader": "joint", "model": "qwen3.8-27b"}
+{"key": "B_IX_451_p0068", "starts": [], "art": "verhoer", "lines": 68, "sha": "9388cb96c07a", "reader": "joint", "model": "qwen3.8-27b"}
+{"key": "B_IX_451_p0069", "starts": [2], "art": "verhoer", "lines": 66, "sha": "ece8efc34fc1", "reader": "joint", "model": "qwen3.8-27b"}
+{"key": "B_IX_451_p0070", "starts": [], "art": "verhoer", "lines": 65, "sha": "315977868256", "reader": "joint", "model": "qwen3.8-27b"}
+{"key": "B_IX_451_p0055", "starts": [23], "art": "verhoer", "lines": 55, "sha": "a81a06701033", "reader": "joint", "model": "qwen3.8-27b"}
+{"key": "B_IX_451_p0071", "starts": [], "art": "verhoer", "lines": 63, "sha": "dfa3aac2b693", "reader": "joint", "model": "qwen3.8-27b"}
+{"key": "B_IX_504_p0001", "starts": [], "art": "leer", "lines": 3, "sha": "765cf056a4bb", "reader": "joint", "model": "qwen3.8-27b"}
+{"key": "B_IX_451_p0072", "starts": [], "art": "verhoer", "lines": 68, "sha": "6005d23bc350", "reader": "joint", "model": "qwen3.8-27b"}
+{"key": "B_IX_451_p0073", "starts": [], "art": "verhoer", "lines": 68, "sha": "f14f592c2082", "reader": "joint", "model": "qwen3.8-27b"}
+{"key": "B_IX_455_p0067", "starts": [1], "art": "verhoer", "lines": 97, "sha": "2c9d3b8188ad", "reader": "joint", "model": "qwen3.8-27b"}

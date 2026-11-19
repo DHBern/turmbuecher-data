@@ -4,6 +4,11 @@
 from a file in this repository). The model is a reasoning model; thinking is
 switched off (``enable_thinking: false``), since extraction is not a reasoning
 task and thinking is spent against the token ceiling.
+
+``TB_LLM_MODEL`` names another model on the same gateway. ``gpt-oss-120b`` is
+the fallback for entries qwen3.8 cannot describe (it loops until the token
+limit on a few long entries); it cannot switch thinking off, so it is asked for
+``reasoning_effort: low``. Every record keeps the model that wrote it.
 """
 
 from __future__ import annotations
@@ -24,6 +29,8 @@ def chat(system: str, user: str, max_tokens: int = 1500) -> str:
         "model": MODEL, "temperature": 0, "max_tokens": max_tokens,
         "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
         "chat_template_kwargs": {"enable_thinking": False},
+        # gpt-oss cannot switch thinking off; keep it short so it does not eat the ceiling
+        **({"reasoning_effort": "low"} if MODEL.startswith("gpt-oss") else {}),
     }).encode()
     err = ""
     for attempt in range(5):

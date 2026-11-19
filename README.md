@@ -11,15 +11,23 @@ Viewer: <https://dhbern.github.io/turmbuecher-data/> (abgeleitet aus dem der
 [St. Galler Missiven](https://github.com/DHBern/sg-missiven-data) und der
 [Thuner Missiven](https://github.com/DHBern/thun-missiven-data)).
 
-## Stand (15.11.2026)
+## Stand (19.11.2026)
 
 - **Alle 89 Bände** sind eingelesen (13 089 Seiten, 11 010 mit Text, 839 in Transkribus als Ground
   Truth markiert), darunter der Band «Henzi» (in Transkribus «Henzi_duplicated»).
-- **Einträge:** Alle 82 Bände mit Text sind maschinell in 8 086 Einträge gegliedert; 7 928 davon
-  haben Datum, Titel (Delikt und Person), Kurzregest, Delikte und Ausgang (`scripts/entries.py`,
-  offenes Modell Qwen3.8-27B auf dem GPUStack der Universität Bern, Vokabular in
-  `taxonomy/delikte.json`, erweiterbar nach `taxonomy/README.md`). Alles ungeprüfte
-  Maschinenentwürfe. Sieben Bände (B IX 498–500, 502–505) haben in Transkribus noch keinen Text.
+- **Einträge:** Alle Bände sind maschinell in 9 408 Einträge gegliedert; 9 333 davon haben Datum,
+  Titel (Delikt und Person), Kurzregest, Delikte und Ausgang (`scripts/entries.py`, offenes Modell
+  Qwen3.8-27B auf dem GPUStack der Universität Bern, Vokabular in `taxonomy/delikte.json`,
+  erweiterbar nach `taxonomy/README.md`). Alles ungeprüfte Maschinenentwürfe. Bände ohne Text in
+  Transkribus (B IX 498–500, 502–505 u. a.) sind auf der gemeinsamen Lesung gegliedert.
+  - **Ersatzmodell:** Bei 16 langen Einträgen geriet Qwen3.8 in eine Schleife bis zur
+    Token-Grenze und lieferte keine Beschreibung. Diese sind am 19.11.2026 mit dem offenen Modell
+    gpt-oss-120b (gleicher Prompt, `reasoning_effort: low`) beschrieben:
+    `TB_LLM_MODEL=gpt-oss-120b python scripts/entries.py extract`. Jeder Eintrag nennt das Modell,
+    das ihn beschrieben hat (Viewer, `entries/entries.jsonl`, TEI-Kopf). Bei 4 davon ist die
+    Maschinenlesung so schlecht, dass auch gpt-oss kein Regest gibt (Titel «Vorwurf unklar»):
+    B IX 422 Nr. 38, B IX 442 Nr. 0, B IX 457 Nr. 20 und 74.
+  - Die übrigen 71 Einträge ohne Regest sind leere Seiten, Register und Titelblätter.
 - **Jahre** gelten nur innerhalb der Laufzeit ihres Bandes: für B IX 422–492 laut Archivkatalog des
   Staatsarchivs (`taxonomy/bandjahre.json`), sonst laut Titel oder aus den gelesenen Jahren und den
   Nachbarbänden erschlossen. Ein Jahr, das genau 50 oder 100 Jahre daneben liegt oder sich in der
@@ -52,10 +60,21 @@ Viewer: <https://dhbern.github.io/turmbuecher-data/> (abgeleitet aus dem der
   der eigenen Modelle (`scripts/vorbehalt.py` → `readings/vorbehalt.tsv`). Seiten, die in 187323
   leer sind, übernehmen die Maschinenlesung der älteren Sammlungen (z. B. B IX 505). Liste der Bände
   mit Ground Truth: [`ground-truth/`](ground-truth/README.md).
-- **Lesungen:** der maschinelle Text aus Transkribus (`transkribus-bestand`). Weitere Lesungen mit eigenen Modellen (Qwen3.5-4B Kurrent, TrOCR
-  Kurrent) laufen und werden zu einer gemeinsamen Lesung zusammengeführt
-  (`scripts/joint_reading.py`): ein Wort ändert sich nur, wo zwei andere Leser übereinstimmen. Ein
-  Abgleich mit Ground Truth ist nicht das Ziel.
+- **Lesungen:** der maschinelle Text aus Transkribus (`transkribus-bestand`) und vier Lesungen
+  eigener Modelle auf allen 13 089 Seiten (17.11.2026, asteraix): Qwen3.5-4B Kurrent und olmOCR 2
+  7B Kurrent lesen ganze Seiten, TrOCR Turmbücher und TrOCR Kurrent 16./17. Jh. die Zeilen aus
+  Transkribus. Sie sind zu einer gemeinsamen Lesung zusammengeführt (`scripts/joint_reading.py`):
+  ein Wort ändert sich nur, wo zwei andere Leser übereinstimmen; abgeschnittene Lesungen und
+  solche in einer Schleife zählen nicht.
+  - **Messung (17.11.2026)** auf 100 handkorrigierten Ground-Truth-Seiten, CER normalisiert:
+    gemeinsame Lesung 12,6 %, HTR aus Transkribus 14,0 %, TrOCR Kurrent 15,0 %, Seitenmodelle
+    62–82 % (Schleifen; Median ~32 %). TrOCR Turmbücher (5,0 %) ist auf diesen Seiten trainiert und
+    damit kein Mass; ohne diese Stimme liegt die gemeinsame Lesung bei 13,9 %. Zum Vergleich das
+    geschlossene Modell Gemini Argon: 16,8 % (nicht im Viewer, da kein offenes Modell).
+  - **TrOCR Turmbücher auf Ground-Truth-Seiten zurückgehalten** (19.11.2026): Weil das Modell auf
+    der Ground Truth trainiert ist und sie fast wörtlich wiedergibt, ist seine Lesung auf den
+    1 909 Seiten mit Ground Truth entfernt und zählt dort nicht für die gemeinsame Lesung
+    (`scripts/vorbehalt_lesungen.py`, nach `collect_readings.py`, vor `joint_reading.py`).
 - **Text und Bild sind Zeile für Zeile verknüpft** (Zeilenumrisse aus Transkribus).
 - **Personen, Orte, Organisationen und Daten**, soweit in Transkribus ausgezeichnet, werden
   übernommen (`entities/`): ungeprüft, noch nicht mit Normdaten verknüpft.

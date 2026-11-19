@@ -18,7 +18,7 @@
   "label": "TrOCR Turmbücher (Transkribus-Zeilen)",
   "kind": "eigenes Modell, Zeile für Zeile",
   "about": "TrOCR, an der Universität Bern auf die Turmbücher feinjustiert; liest Zeile für Zeile auf den Zeilen, die in Transkribus gesetzt sind. Zeile i der Lesung gehört zur selben Bildzeile wie Zeile i des Transkribus-Texts.",
-  "caveat": "Unkorrigierte Maschinenlesung. Was die Zeilenerkennung in Transkribus übersehen hat, fehlt auch hier; Seiten ohne Zeilen bleiben leer."
+  "caveat": "Unkorrigierte Maschinenlesung. Was die Zeilenerkennung in Transkribus übersehen hat, fehlt auch hier; Seiten ohne Zeilen bleiben leer. Das Modell ist auf der Ground Truth dieser Bände trainiert und gibt sie dort fast wörtlich wieder; auf den Seiten mit Ground Truth ist seine Lesung deshalb bis zum 1. Juli 2027 zurückgehalten und zählt dort auch nicht für die gemeinsame Lesung."
  },
  {
   "id": "qwen3.5-4b-german-kurrent-xvi-xix-page-v1",
